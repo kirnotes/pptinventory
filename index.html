@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Pickle Pod POS</title>
+
+<style>
+body{
+margin:0;
+font-family:Arial;
+background:#0b0f2a;
+color:white;
+padding:20px;
+}
+
+h1{text-align:center;color:#00ffd5;}
+
+.panel{
+background:#111a33;
+padding:15px;
+margin:10px 0;
+border-radius:10px;
+}
+
+input,select,button{
+width:100%;
+padding:12px;
+margin:5px 0;
+font-size:16px;
+border:none;
+border-radius:6px;
+}
+
+button{
+background:#00eaff;
+font-weight:bold;
+cursor:pointer;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:10px;
+}
+
+th,td{
+border-bottom:1px solid #333;
+padding:8px;
+text-align:center;
+}
+</style>
+
+</head>
+
+<body>
+
+<h1> Pickle Pod Inventory </h1>
+
+<!-- ADD PRODUCT -->
+<div class="panel">
+<h2>Add Product</h2>
+
+<input id="name" placeholder="Product Name">
+<input id="stock" type="number" placeholder="Starting Stock">
+<input id="price" type="number" placeholder="Price">
+
+<button onclick="addProduct()">ADD PRODUCT</button>
+</div>
+
+<!-- SELL -->
+<div class="panel">
+<h2>Sell Product</h2>
+
+<select id="product"></select>
+<input id="qty" type="number" placeholder="Quantity">
+
+<select id="pay">
+<option value="cash">Cash</option>
+<option value="gcash">GCash</option>
+</select>
+
+<button onclick="sell()">SELL</button>
+</div>
+
+<!-- INVENTORY -->
+<div class="panel">
+<h2>Inventory</h2>
+
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Starting</th>
+<th>Ending</th>
+<th>Price</th>
+<th>Sold</th>
+<th>Amount</th>
+</tr>
+</thead>
+
+<tbody id="inv"></tbody>
+</table>
+</div>
+
+<!-- TOTALS -->
+<div class="panel">
+<h2>Totals</h2>
+<p>Cash: ₱ <span id="cash">0</span></p>
+<p>GCash: ₱ <span id="gcash">0</span></p>
+<p>Total: ₱ <span id="total">0</span></p>
+</div>
+
+<script>
+let products = [];
+
+let cash = 0;
+let gcash = 0;
+
+/* ADD PRODUCT */
+function addProduct(){
+
+let name = document.getElementById("name").value;
+let stock = Number(document.getElementById("stock").value);
+let price = Number(document.getElementById("price").value);
+
+if(!name || !stock || !price){
+alert("Fill all fields");
+return;
+}
+
+products.push({
+name,
+starting: stock,
+stock: stock,
+price: price,
+sold: 0
+});
+
+document.getElementById("name").value="";
+document.getElementById("stock").value="";
+document.getElementById("price").value="";
+
+render();
+}
+
+/* SELL */
+function sell(){
+
+let i = document.getElementById("product").value;
+let qty = Number(document.getElementById("qty").value);
+let pay = document.getElementById("pay").value;
+
+if(qty <= 0) return;
+
+let p = products[i];
+
+if(p.stock < qty){
+alert("Not enough stock");
+return;
+}
+
+p.stock -= qty;
+p.sold += qty;
+
+let total = qty * p.price;
+
+if(pay === "cash") cash += total;
+if(pay === "gcash") gcash += total;
+
+document.getElementById("qty").value = "";
+
+render();
+}
+
+/* RENDER */
+function render(){
+
+let sel = document.getElementById("product");
+sel.innerHTML = "";
+
+let table = document.getElementById("inv");
+table.innerHTML = "";
+
+products.forEach((p,i)=>{
+
+sel.innerHTML += `<option value="${i}">${p.name}</option>`;
+
+table.innerHTML += `
+<tr>
+<td>${p.name}</td>
+<td>${p.starting}</td>
+<td>${p.stock}</td>
+<td>${p.price}</td>
+<td>${p.sold}</td>
+<td>${p.sold * p.price}</td>
+</tr>
+`;
+});
+
+document.getElementById("cash").innerText = cash;
+document.getElementById("gcash").innerText = gcash;
+document.getElementById("total").innerText = cash + gcash;
+}
+</script>
+
+</body>
+</html>
