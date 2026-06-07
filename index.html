@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>TPP INVENTORY</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap');
@@ -11,107 +11,117 @@
   --bdr:#1e2736;--bdr2:#2a3445;
   --acc:#00f0a0;--acc2:rgba(0,240,160,.12);
   --blue:#3b9eff;--blue2:rgba(59,158,255,.12);
-  --pur:#9b7fff;--pur2:rgba(155,127,255,.12);
+  --pur:#9b7fff;
   --warn:#ffb547;--warn2:rgba(255,181,71,.12);
   --red:#ff4d6a;--red2:rgba(255,77,106,.12);
   --grn:#34d399;--txt:#dde3ee;--mut:#5a6478;--mut2:#8492aa;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-html{-webkit-text-size-adjust:100%;}
-body{background:var(--bg);color:var(--txt);font-family:'DM Sans',sans-serif;min-height:100vh;font-size:14px;line-height:1.5;}
+html{-webkit-text-size-adjust:100%;touch-action:manipulation;}
+body{background:var(--bg);color:var(--txt);font-family:'DM Sans',sans-serif;min-height:100vh;font-size:14px;line-height:1.5;overscroll-behavior:none;}
 
-/* ── HEADER ── */
-header{background:var(--sur);border-bottom:1px solid var(--bdr);height:50px;display:flex;align-items:center;padding:0 14px;gap:10px;position:sticky;top:0;z-index:200;}
-.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:16px;letter-spacing:3px;color:var(--acc);white-space:nowrap;}
+/* HEADER */
+header{background:var(--sur);border-bottom:1px solid var(--bdr);height:50px;display:flex;align-items:center;padding:0 12px;gap:8px;position:sticky;top:0;z-index:200;}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:15px;letter-spacing:3px;color:var(--acc);white-space:nowrap;}
 .logo em{color:var(--mut2);font-style:normal;}
-.hdr-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
-.sync-dot{width:7px;height:7px;border-radius:50%;background:var(--mut);flex-shrink:0;}
+.hdr-r{margin-left:auto;display:flex;align-items:center;gap:8px;}
+.sync-pill{display:flex;align-items:center;gap:5px;background:var(--sur2);border:1px solid var(--bdr2);border-radius:20px;padding:4px 10px;font-size:10px;color:var(--mut2);font-family:'DM Sans',sans-serif;font-weight:600;}
+.sync-dot{width:6px;height:6px;border-radius:50%;background:var(--mut);flex-shrink:0;}
 .sync-dot.ok{background:var(--acc);}
-.sync-dot.busy{background:var(--warn);animation:pulse .8s ease-in-out infinite;}
+.sync-dot.busy{background:var(--warn);animation:pulse .7s ease-in-out infinite;}
 .sync-dot.err{background:var(--red);}
-@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
-.user-badge{background:var(--sur2);border:1px solid var(--bdr2);border-radius:20px;padding:4px 10px;font-size:11px;color:var(--mut2);cursor:pointer;white-space:nowrap;}
-.user-badge:hover{border-color:var(--acc);color:var(--acc);}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.2;}}
+.usr-btn{background:var(--sur2);border:1px solid var(--bdr2);border-radius:20px;padding:5px 11px;font-size:11px;color:var(--mut2);cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;white-space:nowrap;}
+.usr-btn:hover{border-color:var(--acc);color:var(--acc);}
 
-/* ── BOTTOM NAV (mobile) ── */
-.bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--sur);border-top:1px solid var(--bdr);z-index:200;padding-bottom:env(safe-area-inset-bottom);}
-.bottom-nav-inner{display:flex;}
-.bnav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 4px;border:none;background:none;color:var(--mut);font-size:9px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;cursor:pointer;font-family:'DM Sans',sans-serif;transition:color .15s;}
-.bnav-btn .ico{font-size:18px;line-height:1;}
-.bnav-btn.active{color:var(--acc);}
-/* Desktop top nav */
-.top-nav{display:flex;gap:1px;overflow-x:auto;flex:1;}
+/* TOP NAV (tablet+desktop) */
+.top-nav{display:flex;gap:1px;overflow-x:auto;}
 .top-nav::-webkit-scrollbar{display:none;}
-.tnav-btn{background:none;border:none;color:var(--mut);font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;padding:0 12px;height:50px;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;transition:color .15s,border-color .15s;}
+.tnav-btn{background:none;border:none;color:var(--mut);font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;letter-spacing:.7px;text-transform:uppercase;padding:0 11px;height:50px;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;transition:color .15s,border-color .15s;}
 .tnav-btn:hover{color:var(--txt);}
 .tnav-btn.active{color:var(--acc);border-bottom-color:var(--acc);}
 
-/* ── LAYOUT ── */
-main{padding:14px;max-width:1700px;margin:0 auto;padding-bottom:80px;}
+/* BOTTOM NAV (phone) */
+.bot-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--sur);border-top:1px solid var(--bdr);z-index:200;padding-bottom:env(safe-area-inset-bottom,0px);}
+.bot-inner{display:flex;}
+.bnav{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:7px 2px 6px;border:none;background:none;color:var(--mut);font-size:9px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;cursor:pointer;font-family:'DM Sans',sans-serif;transition:color .15s;min-width:0;}
+.bnav .ico{font-size:17px;line-height:1;}
+.bnav.active{color:var(--acc);}
+@media(max-width:700px){
+  .top-nav{display:none;}
+  .bot-nav{display:block;}
+  main{padding-bottom:75px;}
+}
+@media(min-width:701px){.bot-nav{display:none;}}
+
+/* MAIN */
+main{padding:14px;max-width:1700px;margin:0 auto;}
 .tab-content{display:none;}
-.tab-content.active{display:block;animation:fi .18s;}
+.tab-content.active{display:block;animation:fi .15s ease;}
 @keyframes fi{from{opacity:0;transform:translateY(3px);}to{opacity:1;transform:none;}}
 
-/* ── CARDS ── */
-.card{background:var(--sur);border:1px solid var(--bdr);border-radius:8px;padding:14px 16px;margin-bottom:14px;}
-.sec{font-family:'Syne',sans-serif;font-weight:700;font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--mut2);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+/* CARDS */
+.card{background:var(--sur);border:1px solid var(--bdr);border-radius:8px;padding:14px 15px;margin-bottom:12px;}
+.sec{font-family:'Syne',sans-serif;font-weight:700;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--mut2);margin-bottom:10px;display:flex;align-items:center;gap:8px;}
 .sec::after{content:'';flex:1;height:1px;background:var(--bdr);}
 
-/* ── FORM ── */
-label{display:block;font-size:10px;font-weight:600;color:var(--mut);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;}
-input,select,textarea{width:100%;background:var(--sur2);border:1px solid var(--bdr2);border-radius:5px;color:var(--txt);font-family:'DM Sans',sans-serif;font-size:14px;padding:9px 11px;outline:none;transition:border-color .15s;-webkit-appearance:none;}
+/* FORM */
+label{display:block;font-size:10px;font-weight:600;color:var(--mut);text-transform:uppercase;letter-spacing:.7px;margin-bottom:4px;}
+input,select{width:100%;background:var(--sur2);border:1px solid var(--bdr2);border-radius:5px;color:var(--txt);font-family:'DM Sans',sans-serif;font-size:14px;padding:9px 11px;outline:none;transition:border-color .15s;-webkit-appearance:none;appearance:none;}
 input:focus,select:focus{border-color:var(--acc);background:var(--sur3);}
 input[type=number]{font-family:'DM Mono',monospace;font-size:13px;}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%235a6478' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px;}
 select option{background:var(--sur2);}
-/* Bigger touch targets on mobile */
-@media(max-width:768px){
-  input,select{padding:11px 12px;font-size:15px;}
-  input[type=number]{font-size:14px;}
-}
+@media(max-width:700px){input,select{font-size:16px;padding:11px 12px;}input[type=number]{font-size:15px;}}
 
-/* ── BUTTONS ── */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:9px 16px;border-radius:6px;border:none;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;cursor:pointer;transition:all .15s;white-space:nowrap;min-height:38px;}
-.btn-acc{background:var(--acc);color:#000;}.btn-acc:hover{background:#00ffb3;box-shadow:0 0 14px rgba(0,240,160,.3);}
-.btn-blue{background:var(--blue2);color:var(--blue);border:1px solid rgba(59,158,255,.25);}.btn-blue:hover{background:rgba(59,158,255,.2);}
-.btn-ghost{background:var(--sur2);color:var(--mut2);border:1px solid var(--bdr2);}.btn-ghost:hover{color:var(--txt);border-color:var(--mut);}
-.btn-red{background:var(--red2);color:var(--red);border:1px solid rgba(255,77,106,.2);}.btn-red:hover{background:rgba(255,77,106,.22);}
-.btn-sm{padding:5px 10px;font-size:10px;min-height:28px;}
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:9px 15px;border-radius:6px;border:none;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;cursor:pointer;transition:all .15s;white-space:nowrap;min-height:40px;-webkit-tap-highlight-color:transparent;}
+.btn-acc{background:var(--acc);color:#000;}.btn-acc:active{background:#00d48f;}
+.btn-blue{background:var(--blue2);color:var(--blue);border:1px solid rgba(59,158,255,.25);}
+.btn-ghost{background:var(--sur2);color:var(--mut2);border:1px solid var(--bdr2);}
+.btn-ghost:active{border-color:var(--mut);}
+.btn-red{background:var(--red2);color:var(--red);border:1px solid rgba(255,77,106,.2);}
+.btn-sm{padding:5px 9px;font-size:10px;min-height:30px;}
 .btn-full{width:100%;}
-@media(max-width:768px){.btn{min-height:44px;font-size:13px;}.btn-sm{min-height:36px;font-size:11px;}}
+@media(max-width:700px){.btn{min-height:44px;font-size:13px;}.btn-sm{min-height:36px;font-size:11px;}}
 
-/* ── TABLES (desktop) ── */
+/* TABLES */
 .tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
 table{width:100%;border-collapse:collapse;}
-th{background:var(--sur2);color:var(--mut);font-family:'DM Mono',monospace;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;padding:7px 9px;text-align:left;border-bottom:1px solid var(--bdr2);white-space:nowrap;}
-td{padding:7px 9px;border-bottom:1px solid rgba(30,39,54,.6);font-family:'DM Mono',monospace;font-size:12px;vertical-align:middle;}
+th{background:var(--sur2);color:var(--mut);font-family:'DM Mono',monospace;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;padding:7px 8px;text-align:left;border-bottom:1px solid var(--bdr2);white-space:nowrap;}
+td{padding:7px 8px;border-bottom:1px solid rgba(30,39,54,.55);font-family:'DM Mono',monospace;font-size:12px;vertical-align:middle;}
 tr:last-child td{border-bottom:none;}
-tr:hover td{background:rgba(255,255,255,.012);}
-.td-lbl{font-family:'DM Sans',sans-serif;font-weight:500;font-size:13px;}
-.td-acc{color:var(--acc);}.td-warn{color:var(--warn);font-weight:700;}
-.td-neg{color:var(--red);}.td-pos{color:var(--grn);}
-.td-dim{color:var(--mut);}.td-blue{color:var(--blue);}
+tr:hover td{background:rgba(255,255,255,.01);}
+.tl{font-family:'DM Sans',sans-serif;font-weight:500;font-size:13px;}
+.ta{color:var(--acc);}.tw{color:var(--warn);font-weight:700;}
+.tn{color:var(--red);}.tp{color:var(--grn);}
+.td{color:var(--mut);}.tbl{color:var(--blue);}
 
-/* ── POS INPUT CELLS ── */
-.pi{width:60px;padding:4px 5px;text-align:right;font-size:12px;min-height:auto;}
-@media(max-width:768px){.pi{width:52px;font-size:12px;padding:5px 4px;}}
+/* POS INPUTS */
+.pi{width:56px;padding:4px 4px;text-align:right;font-size:11px;min-height:auto;}
+@media(max-width:700px){.pi{width:50px;padding:5px 3px;}}
 
-/* ── MOBILE CARD LIST (replaces table on phone) ── */
-.item-cards{display:none;}
-.item-card{background:var(--sur2);border:1px solid var(--bdr2);border-radius:7px;padding:12px 14px;margin-bottom:8px;}
-.item-card-name{font-weight:600;font-size:14px;margin-bottom:8px;}
-.item-card-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
-.icg-field label{font-size:9px;color:var(--mut);text-transform:uppercase;letter-spacing:.6px;margin-bottom:2px;}
-.icg-val{font-family:'DM Mono',monospace;font-size:12px;color:var(--txt);}
-.icg-val.acc{color:var(--acc);}.icg-val.warn{color:var(--warn);}.icg-val.neg{color:var(--red);}
+/* MOBILE ITEM CARDS */
+.m-cards{display:none;}
+@media(max-width:700px){
+  .pos-tbl{display:none;}
+  .m-cards{display:block;}
+}
+.m-card{background:var(--sur2);border:1px solid var(--bdr2);border-radius:7px;padding:11px 12px;margin-bottom:8px;}
+.mc-name{font-weight:600;font-size:14px;color:var(--txt);margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;}
+.mc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.mcf label{font-size:9px;color:var(--mut);letter-spacing:.5px;margin-bottom:2px;}
+.mcf input{font-size:13px;padding:7px 6px;}
+.mc-calc{display:flex;justify-content:space-between;align-items:center;margin-top:7px;padding-top:7px;border-top:1px solid var(--bdr);font-size:11px;color:var(--mut);}
 
-/* ── STATS STRIP ── */
+/* STATS */
 .stats{display:flex;gap:8px;flex-wrap:wrap;}
-.stat{background:var(--sur2);border:1px solid var(--bdr2);border-radius:7px;padding:10px 13px;flex:1;min-width:100px;}
-.stat .lbl{font-size:9px;color:var(--mut);text-transform:uppercase;letter-spacing:.8px;margin-bottom:1px;}
-.stat .val{font-family:'Syne',sans-serif;font-weight:800;font-size:20px;}
+.stat{background:var(--sur2);border:1px solid var(--bdr2);border-radius:7px;padding:10px 12px;flex:1;min-width:90px;}
+.stat .lbl{font-size:9px;color:var(--mut);text-transform:uppercase;letter-spacing:.7px;margin-bottom:1px;}
+.stat .val{font-family:'Syne',sans-serif;font-weight:800;font-size:19px;}
 
-/* ── BADGES ── */
-.bdg{display:inline-block;padding:2px 7px;border-radius:3px;font-family:'DM Mono',monospace;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;}
+/* BADGES */
+.bdg{display:inline-block;padding:2px 6px;border-radius:3px;font-family:'DM Mono',monospace;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;}
 .b-am{background:rgba(0,240,160,.15);color:var(--acc);}
 .b-pm{background:rgba(59,158,255,.15);color:var(--blue);}
 .b-wd{background:rgba(155,127,255,.15);color:var(--pur);}
@@ -120,80 +130,63 @@ tr:hover td{background:rgba(255,255,255,.012);}
 .b-pend{background:rgba(255,181,71,.15);color:var(--warn);}
 .b-done{background:rgba(0,240,160,.15);color:var(--acc);}
 
-/* ── MODAL ── */
-.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:500;align-items:flex-end;justify-content:center;padding:0;}
-.modal-bg.open{display:flex;}
-.modal-box{background:var(--sur);border:1px solid var(--bdr2);border-radius:12px 12px 0 0;padding:20px;width:100%;max-width:800px;max-height:90vh;overflow-y:auto;}
-@media(min-width:600px){
-  .modal-bg{align-items:center;padding:16px;}
-  .modal-box{border-radius:12px;max-height:88vh;}
-}
-.modal-hd{font-family:'Syne',sans-serif;font-weight:800;font-size:16px;color:var(--acc);margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;}
-.modal-close{background:none;border:none;color:var(--mut);font-size:24px;cursor:pointer;padding:0 4px;line-height:1;}
-
-/* ── NOTEBOX ── */
-.note{font-size:12px;padding:9px 12px;border-radius:5px;margin-bottom:10px;display:none;font-family:'DM Sans',sans-serif;}
+/* NOTEBOX */
+.note{font-size:12px;padding:9px 12px;border-radius:5px;margin-bottom:10px;display:none;}
 .note.info{background:var(--blue2);color:var(--blue);border:1px solid rgba(59,158,255,.2);}
 .note.warn{background:var(--warn2);color:var(--warn);border:1px solid rgba(255,181,71,.2);}
 .note.ok{background:var(--acc2);color:var(--acc);border:1px solid rgba(0,240,160,.2);}
 
-/* ── PROGRESS BAR ── */
-.prg{display:flex;align-items:center;gap:6px;}
-.prg-track{flex:1;height:4px;background:var(--bdr2);border-radius:2px;overflow:hidden;}
-.prg-fill{height:100%;border-radius:2px;background:var(--acc);}
-.prg-fill.mid{background:var(--warn);}.prg-fill.low{background:var(--red);}
+/* MODAL */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:500;align-items:flex-end;justify-content:center;}
+.modal-bg.open{display:flex;}
+.modal-box{background:var(--sur);border:1px solid var(--bdr2);border-radius:12px 12px 0 0;padding:18px;width:100%;max-width:860px;max-height:88vh;overflow-y:auto;}
+@media(min-width:600px){.modal-bg{align-items:center;padding:14px;}.modal-box{border-radius:10px;}}
+.modal-hd{font-family:'Syne',sans-serif;font-weight:800;font-size:15px;color:var(--acc);margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;}
+.modal-close{background:none;border:none;color:var(--mut);font-size:24px;cursor:pointer;padding:0 3px;line-height:1;min-width:32px;min-height:32px;}
 
-/* ── MONTHLY GRID ── */
-.mon-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-bottom:16px;}
-.mon-card{background:var(--sur2);border:1px solid var(--bdr);border-radius:7px;padding:11px 12px;cursor:pointer;transition:border-color .15s;}
-.mon-card:hover,.mon-card.active{border-color:var(--acc);}
+/* PROGRESS */
+.prg{display:flex;align-items:center;gap:5px;}
+.prg-t{flex:1;height:4px;background:var(--bdr2);border-radius:2px;overflow:hidden;}
+.prg-f{height:100%;border-radius:2px;background:var(--acc);}
+.prg-f.mid{background:var(--warn);}.prg-f.low{background:var(--red);}
+
+/* YEAR/MONTH GRID */
+.mon-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:7px;margin-bottom:14px;}
+.mon-card{background:var(--sur2);border:1px solid var(--bdr);border-radius:7px;padding:10px 11px;cursor:pointer;transition:border-color .15s;-webkit-tap-highlight-color:transparent;}
+.mon-card:active,.mon-card.sel{border-color:var(--acc);}
 .mon-card.empty{opacity:.4;}
-.mon-lbl{font-family:'DM Mono',monospace;font-size:9px;color:var(--mut);letter-spacing:.8px;margin-bottom:3px;}
-.mon-val{font-family:'Syne',sans-serif;font-weight:800;font-size:15px;}
+.mon-lbl{font-family:'DM Mono',monospace;font-size:9px;color:var(--mut);letter-spacing:.7px;margin-bottom:3px;}
+.mon-val{font-family:'Syne',sans-serif;font-weight:800;font-size:14px;}
 
-/* ── DASH GRID ── */
-.dash{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;margin-bottom:14px;}
-.dchip{background:var(--sur2);border:1px solid var(--bdr2);border-radius:7px;padding:10px 12px;}
-.dchip .lbl{font-size:9px;color:var(--mut);text-transform:uppercase;letter-spacing:.7px;}
-.dchip .val{font-family:'Syne',sans-serif;font-weight:800;font-size:18px;}
+/* DASH CHIPS */
+.dash{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:7px;margin-bottom:12px;}
+.dc{background:var(--sur2);border:1px solid var(--bdr2);border-radius:7px;padding:10px 11px;}
+.dc .lbl{font-size:9px;color:var(--mut);text-transform:uppercase;letter-spacing:.6px;}
+.dc .val{font-family:'Syne',sans-serif;font-weight:800;font-size:17px;}
 
-/* ── GCASH ── */
+/* GCASH */
 .gc-row{display:flex;gap:6px;align-items:center;margin-bottom:6px;}
 .gc-row input{flex:1;border-left:3px solid var(--blue);}
 
-/* ── LOADING SCREEN ── */
-#loadScreen{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:999;}
-#loadScreen .logo-big{font-family:'Syne',sans-serif;font-weight:800;font-size:32px;letter-spacing:6px;color:var(--acc);}
-#loadScreen .logo-big em{color:var(--mut2);font-style:normal;}
-.spin{width:24px;height:24px;border:2px solid var(--bdr2);border-top-color:var(--acc);border-radius:50%;animation:sp .6s linear infinite;}
-@keyframes sp{to{transform:rotate(360deg);}}
-#loadMsg{font-size:12px;color:var(--mut);font-family:'DM Sans',sans-serif;}
-
-/* ── TOAST ── */
-#toast{position:fixed;bottom:70px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--sur);border:1px solid var(--acc);border-radius:6px;padding:9px 18px;font-size:12px;color:var(--acc);font-family:'DM Sans',sans-serif;font-weight:600;opacity:0;transition:all .25s;z-index:999;pointer-events:none;white-space:nowrap;}
+/* TOAST */
+#toast{position:fixed;bottom:72px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--sur);border:1px solid var(--acc);border-radius:6px;padding:9px 18px;font-size:12px;color:var(--acc);font-family:'DM Sans',sans-serif;font-weight:600;opacity:0;transition:all .25s;z-index:999;pointer-events:none;white-space:nowrap;max-width:calc(100vw - 32px);}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
-@media(min-width:600px){#toast{bottom:24px;}}
+@media(min-width:700px){#toast{bottom:24px;}}
 
-/* ── GRID HELPERS ── */
-.row{display:flex;gap:12px;flex-wrap:wrap;}.col{flex:1;min-width:140px;}
-hr{border:none;border-top:1px solid var(--bdr);margin:12px 0;}
+/* SETUP SCREEN */
+#setupScreen{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;gap:14px;z-index:999;text-align:center;}
+.setup-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:28px;letter-spacing:5px;color:var(--acc);}
+.setup-logo em{color:var(--mut2);font-style:normal;}
+.setup-box{background:var(--sur);border:1px solid var(--bdr2);border-radius:10px;padding:22px;width:100%;max-width:420px;}
+.setup-box h2{font-family:'Syne',sans-serif;font-size:14px;font-weight:800;letter-spacing:1px;color:var(--txt);margin-bottom:8px;}
+.setup-box p{font-size:12px;color:var(--mut2);line-height:1.6;margin-bottom:14px;}
+.setup-box input{margin-bottom:10px;font-size:13px;}
+.spin{width:22px;height:22px;border:2px solid var(--bdr2);border-top-color:var(--acc);border-radius:50%;animation:sp .6s linear infinite;}
+@keyframes sp{to{transform:rotate(360deg);}}
+#setupMsg{font-size:12px;color:var(--mut);font-family:'DM Sans',sans-serif;}
 
-/* ── MOBILE: show card list instead of table for POS ── */
-@media(max-width:700px){
-  .pos-desktop{display:none;}
-  .item-cards{display:block;}
-  main{padding:10px;padding-bottom:90px;}
-  .logo{font-size:14px;letter-spacing:2px;}
-}
-@media(min-width:701px){
-  .bottom-nav{display:none;}
-  .top-nav{display:flex;}
-}
-@media(max-width:700px){
-  .top-nav{display:none;}
-  .bottom-nav{display:block;}
-}
-
+hr{border:none;border-top:1px solid var(--bdr);margin:11px 0;}
+.row{display:flex;gap:10px;flex-wrap:wrap;}.col{flex:1;min-width:140px;}
 ::-webkit-scrollbar{width:4px;height:4px;}
 ::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:var(--bdr2);border-radius:2px;}
@@ -201,16 +194,25 @@ hr{border:none;border-top:1px solid var(--bdr);margin:12px 0;}
 </head>
 <body>
 
-<!-- LOADING SCREEN -->
-<div id="loadScreen">
-  <div class="logo-big">TPP <em>INVENTORY</em></div>
-  <div class="spin"></div>
-  <div id="loadMsg">Connecting to database…</div>
+<!-- SETUP / LOADING SCREEN -->
+<div id="setupScreen">
+  <div class="setup-logo">TPP <em>INVENTORY</em></div>
+  <div class="spin" id="setupSpin"></div>
+  <div id="setupMsg">Connecting…</div>
+  <!-- This box shown only if URL not configured -->
+  <div class="setup-box" id="setupBox" style="display:none">
+    <h2>🔗 Connect to Google Sheets</h2>
+    <p>Paste your Google Apps Script Web App URL below.<br>
+       This connects all devices to the same shared data.</p>
+    <label>Web App URL</label>
+    <input type="url" id="apiInput" placeholder="https://script.google.com/macros/s/.../exec">
+    <button class="btn btn-acc btn-full" onclick="connectAPI()">Connect & Load Data</button>
+    <div id="apiErr" style="color:var(--red);font-size:11px;margin-top:8px;display:none"></div>
+  </div>
 </div>
 
 <header>
   <div class="logo">TPP <em>INV</em></div>
-  <!-- Desktop nav -->
   <div class="top-nav" id="topNav">
     <button class="tnav-btn" onclick="switchTab('daily')">⚡ POS</button>
     <button class="tnav-btn" onclick="switchTab('logs')">📋 Logs</button>
@@ -219,30 +221,29 @@ hr{border:none;border-top:1px solid var(--bdr);margin:12px 0;}
     <button class="tnav-btn" onclick="switchTab('loyalty')">🎴 Loyalty</button>
     <button class="tnav-btn" onclick="switchTab('items')">🗂 Items</button>
   </div>
-  <div class="hdr-right">
-    <div class="sync-dot" id="syncDot" title="Sync status"></div>
-    <div class="user-badge" id="userBadge" onclick="promptUser()">👤 Set Name</div>
+  <div class="hdr-r">
+    <div class="sync-pill"><div class="sync-dot" id="syncDot"></div><span id="syncTxt">—</span></div>
+    <button class="usr-btn" id="usrBtn" onclick="promptUser()">👤 Set Name</button>
   </div>
 </header>
 
-<!-- Mobile bottom nav -->
-<div class="bottom-nav">
-  <div class="bottom-nav-inner">
-    <button class="bnav-btn" id="bn-daily" onclick="switchTab('daily')"><span class="ico">⚡</span>POS</button>
-    <button class="bnav-btn" id="bn-logs"  onclick="switchTab('logs')"><span class="ico">📋</span>Logs</button>
-    <button class="bnav-btn" id="bn-stock" onclick="switchTab('stock')"><span class="ico">📦</span>Stock</button>
-    <button class="bnav-btn" id="bn-live"  onclick="switchTab('live')"><span class="ico">🔴</span>Live</button>
-    <button class="bnav-btn" id="bn-items" onclick="switchTab('items')"><span class="ico">🗂</span>Items</button>
+<div class="bot-nav">
+  <div class="bot-inner">
+    <button class="bnav" id="bn-daily"  onclick="switchTab('daily')"><span class="ico">⚡</span>POS</button>
+    <button class="bnav" id="bn-logs"   onclick="switchTab('logs')"><span class="ico">📋</span>Logs</button>
+    <button class="bnav" id="bn-stock"  onclick="switchTab('stock')"><span class="ico">📦</span>Stock</button>
+    <button class="bnav" id="bn-live"   onclick="switchTab('live')"><span class="ico">🔴</span>Live</button>
+    <button class="bnav" id="bn-items"  onclick="switchTab('items')"><span class="ico">🗂</span>Items</button>
   </div>
 </div>
 
 <main>
 
-<!-- ══════════ TAB: DAILY POS ══════════ -->
+<!-- ═══ DAILY POS ═══ -->
 <div id="tab-daily" class="tab-content">
   <div class="card">
     <div class="sec">Shift Info</div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:10px;align-items:end;margin-bottom:12px">
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:9px;align-items:end;margin-bottom:11px">
       <div><label>Date</label><input type="date" id="posDate" onchange="posMetaChanged()"></div>
       <div><label>Shift</label>
         <select id="posShift" onchange="posMetaChanged()">
@@ -253,21 +254,21 @@ hr{border:none;border-top:1px solid var(--bdr);margin:12px 0;}
       </div>
       <div><label>Worker</label><input type="text" id="posWorker" placeholder="Your name" style="text-transform:uppercase"></div>
       <div><label>Status</label>
-        <select id="posStatusSel">
+        <select id="posStatus">
           <option value="Pending">Pending</option>
           <option value="Ready">Ready ✓</option>
         </select>
       </div>
     </div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
-      <button class="btn btn-acc" onclick="saveShift()" style="flex:1">💾 Save Shift</button>
+    <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px">
+      <button class="btn btn-acc" onclick="saveShift()" style="flex:1;min-width:120px">💾 Save Shift</button>
       <button class="btn btn-ghost" onclick="clearPOS()">↺ Clear</button>
-      <button class="btn btn-ghost btn-sm" onclick="loadShift()" title="Reload from server">⟳ Reload</button>
+      <button class="btn btn-ghost btn-sm" onclick="loadShiftFromServer()" title="Reload from server">⟳</button>
     </div>
-    <div id="posNote" class="note info"></div>
+    <div id="posNote" class="note"></div>
 
-    <!-- DESKTOP: table -->
-    <div class="pos-desktop tbl-wrap">
+    <!-- Desktop table -->
+    <div class="pos-tbl tbl-wrap">
       <table>
         <thead><tr>
           <th>Item</th><th>Price</th>
@@ -284,56 +285,53 @@ hr{border:none;border-top:1px solid var(--bdr);margin:12px 0;}
       </table>
     </div>
 
-    <!-- MOBILE: item cards -->
-    <div class="item-cards" id="posCards"></div>
+    <!-- Mobile cards -->
+    <div class="m-cards" id="posCards"></div>
 
     <hr>
     <div class="stats">
       <div class="stat"><div class="lbl">Total</div><div class="val" id="cTotal" style="color:var(--warn)">₱0</div></div>
       <div class="stat"><div class="lbl">GCash</div><div class="val" id="cGcash" style="color:var(--blue)">₱0</div></div>
-      <div class="stat"><div class="lbl">Cash</div><div class="val" id="cCash"  style="color:var(--acc)">₱0</div></div>
-      <div class="stat"><div class="lbl">Sold</div><div class="val" id="cItems">0</div></div>
+      <div class="stat"><div class="lbl">Cash</div><div class="val" id="cCash" style="color:var(--acc)">₱0</div></div>
+      <div class="stat"><div class="lbl">Items</div><div class="val" id="cItems">0</div></div>
     </div>
     <hr>
-    <div class="row" style="align-items:flex-start">
+    <div class="row" style="align-items:flex-start;gap:14px">
       <div class="col">
         <div class="sec">GCash Entries</div>
         <div id="gcashList"></div>
-        <button class="btn btn-ghost btn-sm" onclick="addGcash()" style="margin-top:8px">+ Add GCash Entry</button>
+        <button class="btn btn-ghost btn-sm" onclick="addGcash()" style="margin-top:7px">+ Add GCash</button>
       </div>
-      <div style="min-width:130px">
-        <div class="lbl" style="margin-bottom:3px">GCash Total</div>
-        <div style="font-family:'Syne';font-weight:800;font-size:32px;color:var(--blue)" id="gcashBig">₱0</div>
+      <div style="min-width:120px">
+        <div class="lbl" style="margin-bottom:2px">GCash Total</div>
+        <div style="font-family:'Syne';font-weight:800;font-size:30px;color:var(--blue)" id="gcashBig">₱0</div>
+        <div style="font-size:10px;color:var(--mut);margin-top:1px">Cash = Total − GCash</div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ══════════ TAB: LOGS ══════════ -->
+<!-- ═══ LOGS ═══ -->
 <div id="tab-logs" class="tab-content">
   <div class="card">
-    <div class="sec">Year &amp; Month Filter</div>
-    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:14px">
-      <div style="width:110px"><label>Year</label><select id="logYear" onchange="onYearChange()"></select></div>
-      <div style="width:90px"><label>Shift</label>
+    <div class="sec">Filters</div>
+    <div style="display:flex;gap:9px;flex-wrap:wrap;align-items:flex-end;margin-bottom:13px">
+      <div style="width:105px"><label>Year</label><select id="logYear" onchange="onYearChange()"></select></div>
+      <div style="width:85px"><label>Shift</label>
         <select id="logShiftF" onchange="renderLogs()">
           <option value="">All</option><option value="AM">AM</option>
           <option value="PM">PM</option><option value="WD">WD</option>
         </select>
       </div>
-      <div style="flex:1;min-width:140px"><label>Worker / Date</label>
+      <div style="flex:1;min-width:130px"><label>Worker / Date</label>
         <input type="text" id="logSearch" placeholder="Search…" oninput="renderLogs()">
       </div>
       <button class="btn btn-red btn-sm" onclick="clearAllLogs()" style="align-self:flex-end">🗑 Clear All</button>
     </div>
-
-    <!-- Yearly KPIs -->
-    <div id="yearDash" class="stats" style="margin-bottom:14px"></div>
-    <!-- Monthly grid -->
+    <div class="stats" id="yearDash" style="margin-bottom:12px"></div>
     <div class="mon-grid" id="yearGrid"></div>
     <hr>
-    <!-- Drill-down month -->
-    <div style="width:210px;margin-bottom:14px">
+    <div style="width:200px;margin-bottom:12px">
       <label>Selected Month</label>
       <select id="logMonth" onchange="renderLogs()"></select>
     </div>
@@ -351,11 +349,11 @@ hr{border:none;border-top:1px solid var(--bdr);margin:12px 0;}
   </div>
 </div>
 
-<!-- ══════════ TAB: STOCK ROOM ══════════ -->
+<!-- ═══ STOCK ═══ -->
 <div id="tab-stock" class="tab-content">
   <div class="card">
     <div class="sec">Record Movement</div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;align-items:end">
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(135px,1fr));gap:9px;align-items:end">
       <div><label>Date</label><input type="date" id="stDate"></div>
       <div><label>Item</label><select id="stItem"></select></div>
       <div><label>Action</label>
@@ -374,7 +372,7 @@ hr{border:none;border-top:1px solid var(--bdr);margin:12px 0;}
   <div class="card">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px">
       <div class="sec" style="margin:0">Transaction Log</div>
-      <input type="text" id="stSearch" placeholder="Search…" style="width:160px" oninput="renderStockTable()">
+      <input type="text" id="stSearch" placeholder="Search…" style="width:150px" oninput="renderStockTable()">
     </div>
     <div class="tbl-wrap">
       <table>
@@ -385,14 +383,14 @@ hr{border:none;border-top:1px solid var(--bdr);margin:12px 0;}
   </div>
 </div>
 
-<!-- ══════════ TAB: LIVE INVENTORY ══════════ -->
+<!-- ═══ LIVE ═══ -->
 <div id="tab-live" class="tab-content">
   <div class="card">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
-      <div class="sec" style="margin:0">Live Inventory Snapshot</div>
-      <div style="display:flex;gap:8px">
-        <input type="text" id="liveSearch" placeholder="Filter…" style="width:150px" oninput="renderLive()">
-        <button class="btn btn-ghost btn-sm" onclick="refreshAll().then(renderLive)">↺</button>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:11px;flex-wrap:wrap;gap:7px">
+      <div class="sec" style="margin:0">Live Snapshot</div>
+      <div style="display:flex;gap:7px">
+        <input type="text" id="liveSearch" placeholder="Filter…" style="width:140px" oninput="renderLive()">
+        <button class="btn btn-ghost btn-sm" onclick="doRefresh().then(renderLive)">↺</button>
       </div>
     </div>
     <div class="tbl-wrap">
@@ -405,7 +403,7 @@ hr{border:none;border-top:1px solid var(--bdr);margin:12px 0;}
           <th style="color:var(--pur)">Comps</th>
           <th style="color:var(--red)">OUT</th>
           <th>Remaining</th>
-          <th style="min-width:100px">Level</th>
+          <th style="min-width:90px">Level</th>
         </tr></thead>
         <tbody id="liveBody"></tbody>
       </table>
@@ -413,16 +411,16 @@ hr{border:none;border-top:1px solid var(--bdr);margin:12px 0;}
   </div>
 </div>
 
-<!-- ══════════ TAB: LOYALTY ══════════ -->
+<!-- ═══ LOYALTY ═══ -->
 <div id="tab-loyalty" class="tab-content">
   <div class="card">
     <div class="sec">Add / Update Card</div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;align-items:end">
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(135px,1fr));gap:9px;align-items:end">
       <div><label>Card #</label><input type="text" id="lcNum" placeholder="LC-001"></div>
-      <div><label>Customer Name</label><input type="text" id="lcName" placeholder="Full name"></div>
+      <div><label>Customer</label><input type="text" id="lcName" placeholder="Full name"></div>
       <div><label>Expiry</label><input type="date" id="lcExpiry"></div>
       <div><label>Stickers</label><input type="number" id="lcStickers" min="0" value="0"></div>
-      <div><label>Reward Status</label>
+      <div><label>Reward</label>
         <select id="lcReward">
           <option value="None">None</option>
           <option value="Pending Claim">Pending Claim</option>
@@ -437,7 +435,7 @@ hr{border:none;border-top:1px solid var(--bdr);margin:12px 0;}
   <div class="card">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px">
       <div class="sec" style="margin:0">All Cards</div>
-      <input type="text" id="lcSearch" placeholder="Search…" style="width:160px" oninput="renderLoyalty()">
+      <input type="text" id="lcSearch" placeholder="Search…" style="width:150px" oninput="renderLoyalty()">
     </div>
     <div class="tbl-wrap">
       <table>
@@ -448,18 +446,18 @@ hr{border:none;border-top:1px solid var(--bdr);margin:12px 0;}
   </div>
 </div>
 
-<!-- ══════════ TAB: ITEMS ══════════ -->
+<!-- ═══ ITEMS ═══ -->
 <div id="tab-items" class="tab-content">
   <div class="card">
-    <div class="sec">Add New Item</div>
-    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:16px">
-      <div class="col"><label>Item Name</label><input type="text" id="newName" placeholder="e.g. ENERGY DRINK" style="text-transform:uppercase"></div>
-      <div style="width:130px"><label>Price (₱)</label><input type="number" id="newPrice" min="0" placeholder="0"></div>
+    <div class="sec">Add Item</div>
+    <div style="display:flex;gap:9px;flex-wrap:wrap;align-items:flex-end;margin-bottom:14px">
+      <div class="col"><label>Name</label><input type="text" id="newName" placeholder="ITEM NAME" style="text-transform:uppercase"></div>
+      <div style="width:120px"><label>Price (₱)</label><input type="number" id="newPrice" min="0" placeholder="0"></div>
       <div style="display:flex;align-items:flex-end"><button class="btn btn-acc" onclick="addItem()">+ Add</button></div>
     </div>
     <div class="tbl-wrap">
       <table>
-        <thead><tr><th>#</th><th>Item</th><th>Price</th><th>Edit Price</th><th></th></tr></thead>
+        <thead><tr><th>#</th><th>Item</th><th>Price</th><th>Edit</th><th></th></tr></thead>
         <tbody id="itemsBody"></tbody>
       </table>
     </div>
@@ -482,18 +480,18 @@ hr{border:none;border-top:1px solid var(--bdr);margin:12px 0;}
 <div id="toast"></div>
 
 <script>
-// ══════════════════════════════════════════════════════
-//  ⚙️  CONFIGURATION — PASTE YOUR WEB APP URL BELOW
-// ══════════════════════════════════════════════════════
-const API_URL = 'https://script.google.com/macros/s/AKfycbz98rzynIgSHS9b2qmr3dNyhqB8TkkcmPbA0jvOkEnY2RtE16Ir6rYWRwxzNJMyXbMm/exec';
-// Example: 'https://script.google.com/macros/s/AKfycb.../exec'
+// ══════════════════════════════════════════════════
+//  CONFIG — saved in localStorage so it persists
+// ══════════════════════════════════════════════════
+let API_URL = localStorage.getItem('tpp_api') || '';
 
-// ══════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════
 //  STATE
-// ══════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════
 let products=[], salesLog=[], stockMov=[], loyCards=[];
 let posRows=[], gcashEntries=[];
 let currentUser = localStorage.getItem('tpp_user')||'';
+let isLoading = false;
 
 const DEFAULT_PRODUCTS=[
   {name:'WATER 1L',price:30},{name:'POCARI (500ml)',price:55},{name:'Pocari 900ML',price:100},
@@ -510,148 +508,186 @@ const DEFAULT_PRODUCTS=[
   {name:'HOURLY',price:500},
 ];
 
-// ══════════════════════════════════════════════════════
-//  API — Google Apps Script
-// ══════════════════════════════════════════════════════
-function setSyncState(state){ // 'ok' | 'busy' | 'err'
+// ══════════════════════════════════════════════════
+//  API — ALL requests via GET (no CORS issues)
+// ══════════════════════════════════════════════════
+function setSyncState(s,txt){
   const d=document.getElementById('syncDot');
-  d.className='sync-dot '+state;
+  const t=document.getElementById('syncTxt');
+  d.className='sync-dot '+s;
+  if(t) t.textContent=txt||s;
 }
 
-async function apiGet(params){
-  setSyncState('busy');
+async function api(action, data){
+  let url = API_URL + '?action=' + encodeURIComponent(action);
+  if(data) url += '&data=' + encodeURIComponent(JSON.stringify(data));
+  // Add cache-buster for GET reads
+  url += '&t=' + Date.now();
+  const resp = await fetch(url, {method:'GET', redirect:'follow'});
+  if(!resp.ok) throw new Error('HTTP '+resp.status);
+  const json = await resp.json();
+  if(json.error) throw new Error(json.error);
+  return json;
+}
+
+async function doRefresh(){
+  setSyncState('busy','Syncing…');
   try {
-    const url = API_URL+'?'+new URLSearchParams(params);
-    const r   = await fetch(url);
-    const d   = await r.json();
-    setSyncState('ok');
-    return d;
+    const d = await api('getAll');
+    products = d.products||[];
+    if(!products.length) products=[...DEFAULT_PRODUCTS];
+    salesLog = (d.shifts||[]).sort(shiftSort);
+    stockMov = d.stock||[];
+    loyCards = d.loyalty||[];
+    setSyncState('ok','Synced');
+    // Cache locally for offline fallback
+    localStorage.setItem('tpp_cache', JSON.stringify({products,salesLog,stockMov,loyCards,ts:Date.now()}));
+    return true;
   } catch(e) {
-    setSyncState('err');
+    setSyncState('err','Error');
+    // Try local cache
+    const c=localStorage.getItem('tpp_cache');
+    if(c){
+      const d=JSON.parse(c);
+      products=d.products||[];salesLog=d.salesLog||[];stockMov=d.stockMov||[];loyCards=d.loyCards||[];
+    }
     throw e;
   }
 }
 
-async function apiPost(body){
-  setSyncState('busy');
+function shiftSort(a,b){
+  if(a.date!==b.date) return a.date<b.date?-1:1;
+  const o={AM:0,PM:1,WD:2};
+  return (o[a.shift]??0)-(o[b.shift]??0);
+}
+
+// ══════════════════════════════════════════════════
+//  SETUP SCREEN
+// ══════════════════════════════════════════════════
+async function startApp(){
+  document.getElementById('setupSpin').style.display='block';
+  document.getElementById('setupMsg').textContent='Connecting to Google Sheets…';
+  document.getElementById('setupBox').style.display='none';
+  document.getElementById('apiErr').style.display='none';
   try {
-    const r = await fetch(API_URL, {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify(body)
-    });
-    const d = await r.json();
-    setSyncState('ok');
-    return d;
-  } catch(e){
-    setSyncState('err');
-    throw e;
+    await doRefresh();
+    // Success — hide setup, show app
+    document.getElementById('setupScreen').style.display='none';
+    initApp();
+  } catch(e) {
+    document.getElementById('setupSpin').style.display='none';
+    document.getElementById('setupMsg').textContent='Could not connect.';
+    document.getElementById('setupBox').style.display='block';
+    document.getElementById('apiInput').value = API_URL;
+    const errEl=document.getElementById('apiErr');
+    errEl.textContent='Error: '+e.message+' — Check your URL and make sure the script is deployed as "Anyone" access.';
+    errEl.style.display='block';
   }
 }
 
-async function refreshAll(){
-  const d = await apiGet({action:'getAll'});
-  products = d.products||[];
-  if (!products.length) products=[...DEFAULT_PRODUCTS];
-  salesLog = (d.shifts||[]).sort((a,b)=>a.date!==b.date?(a.date<b.date?-1:1):{AM:0,PM:1,WD:2}[a.shift]-{AM:0,PM:1,WD:2}[b.shift]);
-  stockMov = d.stock||[];
-  loyCards = d.loyalty||[];
+async function connectAPI(){
+  const url = document.getElementById('apiInput').value.trim();
+  if(!url || !url.startsWith('http')){
+    document.getElementById('apiErr').textContent='Please paste a valid URL.';
+    document.getElementById('apiErr').style.display='block';
+    return;
+  }
+  API_URL = url;
+  localStorage.setItem('tpp_api', url);
+  await startApp();
 }
 
-// ══════════════════════════════════════════════════════
+function initApp(){
+  document.getElementById('stDate').value=today();
+  if(currentUser){
+    document.getElementById('usrBtn').textContent='👤 '+currentUser;
+    document.getElementById('posWorker').value=currentUser;
+  }
+  switchTab('daily');
+  document.querySelectorAll('.tnav-btn')[0].classList.add('active');
+  document.getElementById('bn-daily').classList.add('active');
+  posRows=products.map(p=>({name:p.name,price:p.price,start:0,sold:0,comps:0,refill:0}));
+  syncStockSelect();
+  initPOS();
+}
+
+// ══════════════════════════════════════════════════
 //  UTILS
-// ══════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════
 const fmt   = n=>'₱'+Number(n||0).toLocaleString('en-PH');
 const today = ()=>new Date().toISOString().slice(0,10);
 
 function toast(msg,type='acc'){
   const t=document.getElementById('toast');
   t.textContent=msg;
-  t.style.color=type==='err'?'var(--red)':type==='warn'?'var(--warn)':'var(--acc)';
-  t.style.borderColor=type==='err'?'var(--red)':type==='warn'?'var(--warn)':'var(--acc)';
+  const c=type==='err'?'var(--red)':type==='warn'?'var(--warn)':'var(--acc)';
+  t.style.color=c; t.style.borderColor=c;
   t.classList.add('show');
-  clearTimeout(t._t);
-  t._t=setTimeout(()=>t.classList.remove('show'),2800);
+  clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),2600);
 }
 
 function showNote(msg,type='info'){
   const n=document.getElementById('posNote');
-  n.textContent=msg;n.className='note '+type;n.style.display='block';
+  n.textContent=msg; n.className='note '+type; n.style.display='block';
 }
 function hideNote(){const n=document.getElementById('posNote');if(n)n.style.display='none';}
 
 function promptUser(){
-  const n=prompt('Enter your name (this shows on saved shifts):',currentUser);
+  const n=prompt('Enter your name:',currentUser);
   if(n!==null){
     currentUser=n.toUpperCase().trim();
     localStorage.setItem('tpp_user',currentUser);
-    document.getElementById('userBadge').textContent='👤 '+currentUser;
+    document.getElementById('usrBtn').textContent='👤 '+currentUser;
     document.getElementById('posWorker').value=currentUser;
   }
 }
 
-// ══════════════════════════════════════════════════════
-//  TAB SWITCHING
-// ══════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════
+//  TABS
+// ══════════════════════════════════════════════════
 const TABS=['daily','logs','stock','live','loyalty','items'];
-
 function switchTab(name){
-  TABS.forEach(t=>{
-    document.getElementById('tab-'+t).classList.toggle('active',t===name);
-  });
-  // Top nav
-  document.querySelectorAll('.tnav-btn').forEach((b,i)=>{
-    b.classList.toggle('active',TABS[i]===name);
-  });
-  // Bottom nav
+  TABS.forEach(t=>document.getElementById('tab-'+t).classList.toggle('active',t===name));
+  document.querySelectorAll('.tnav-btn').forEach((b,i)=>b.classList.toggle('active',TABS[i]===name));
   ['daily','logs','stock','live','items'].forEach(t=>{
     const b=document.getElementById('bn-'+t);
-    if(b) b.classList.toggle('active',t===name);
+    if(b)b.classList.toggle('active',t===name);
   });
-
-  if(name==='logs')   { refreshAll().then(()=>{ populateYearFilter(); renderYearOverview(); renderLogs(); }); }
-  if(name==='stock')  { refreshAll().then(()=>{ renderStockTable(); syncStockSelect(); }); }
-  if(name==='live')   { refreshAll().then(renderLive); }
-  if(name==='loyalty'){ refreshAll().then(renderLoyalty); }
-  if(name==='items')  { refreshAll().then(renderItems); }
+  if(name==='logs')    doRefresh().then(()=>{populateYearFilter();renderYearOverview();renderLogs();}).catch(()=>{populateYearFilter();renderYearOverview();renderLogs();});
+  if(name==='stock')   doRefresh().then(()=>{renderStockTable();syncStockSelect();}).catch(()=>{renderStockTable();syncStockSelect();});
+  if(name==='live')    doRefresh().then(renderLive).catch(renderLive);
+  if(name==='loyalty') doRefresh().then(renderLoyalty).catch(renderLoyalty);
+  if(name==='items')   doRefresh().then(renderItems).catch(renderItems);
 }
 
-// ══════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════
 //  DAILY POS
-// ══════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════
 function initPOS(){
   document.getElementById('posDate').value=today();
-  if(currentUser) document.getElementById('posWorker').value=currentUser;
   posMetaChanged();
 }
 
-function posMetaChanged(){ loadShift(); }
+function posMetaChanged(){ loadShiftFromServer(); }
 
-async function loadShift(){
+async function loadShiftFromServer(){
   const date =document.getElementById('posDate').value;
   const shift=document.getElementById('posShift').value;
-  if(!date) return;
+  if(!date)return;
 
-  // Refresh data from server first
-  try {
-    const d=await apiGet({action:'getAll'});
-    products=(d.products||[]);
-    if(!products.length) products=[...DEFAULT_PRODUCTS];
-    salesLog=(d.shifts||[]).sort((a,b)=>a.date!==b.date?(a.date<b.date?-1:1):{AM:0,PM:1,WD:2}[a.shift]-{AM:0,PM:1,WD:2}[b.shift]);
-    stockMov=d.stock||[];
-    loyCards=d.loyalty||[];
-  } catch(e){ toast('⚠ Could not reach server','err'); }
+  // Refresh from server
+  try{ await doRefresh(); }catch(e){ /* use cached */ }
 
   const existing=salesLog.find(s=>s.date===date&&s.shift===shift);
   if(existing){
-    document.getElementById('posWorker').value    = existing.worker||currentUser||'';
-    document.getElementById('posStatusSel').value = existing.status||'Pending';
+    document.getElementById('posWorker').value    =existing.worker||currentUser||'';
+    document.getElementById('posStatus').value    =existing.status||'Pending';
     posRows=products.map(p=>{
       const r=(existing.rows||[]).find(x=>x.name===p.name);
       return r?{...r}:{name:p.name,price:p.price,start:0,sold:0,comps:0,refill:0};
     });
     gcashEntries=[...(existing.gcashEntries||[])];
-    showNote(`📂 Loaded ${shift} shift for ${date} — saved by ${existing.worker||'?'}. Editing will overwrite.`,'warn');
+    showNote(`📂 Loaded ${shift} shift · ${date} · saved by ${existing.worker||'?'} · ${existing.status||'Pending'}`,'warn');
   } else {
     posRows=products.map(p=>({name:p.name,price:p.price,start:0,sold:0,comps:0,refill:0}));
     gcashEntries=[];
@@ -664,90 +700,72 @@ async function loadShift(){
           row.start=Math.max(0,end+(sr.refill||0));
         }
       });
-      showNote(`✅ Start auto-filled from ${src.shift} on ${src.date} (${src.worker||'?'}).`,'info');
+      showNote(`✅ Start filled from ${src.shift} on ${src.date} (${src.worker||'?'})`,'info');
     } else {
       hideNote();
     }
   }
-  renderPOS();
-  renderGcashUI();
+  renderPOS(); renderGcashUI();
 }
 
-// Previous shift source logic
 function getPrevSource(date,shift){
   if(shift==='PM'){
-    return salesLog.find(s=>s.date===date&&s.shift==='AM') || lastBefore(date);
+    return salesLog.find(s=>s.date===date&&s.shift==='AM')||lastBefore(date);
   }
   if(shift==='WD'){
     const pd=prevDate(date);
     return (pd&&(salesLog.find(s=>s.date===pd&&s.shift==='PM')||
                  salesLog.find(s=>s.date===pd&&s.shift==='WD')||
-                 salesLog.find(s=>s.date===pd&&s.shift==='AM'))) || lastBefore(date);
+                 salesLog.find(s=>s.date===pd&&s.shift==='AM')))||lastBefore(date);
   }
   return lastBefore(date);
 }
-function lastBefore(date){const b=salesLog.filter(s=>s.date<date);return b.length?b[b.length-1]:null;}
-function prevDate(date){const ds=[...new Set(salesLog.filter(s=>s.date<date).map(s=>s.date))].sort();return ds.length?ds[ds.length-1]:null;}
+function lastBefore(d){const b=salesLog.filter(s=>s.date<d);return b.length?b[b.length-1]:null;}
+function prevDate(d){const ds=[...new Set(salesLog.filter(s=>s.date<d).map(s=>s.date))].sort();return ds.length?ds[ds.length-1]:null;}
 
-// Render POS table + mobile cards
 function renderPOS(){
-  const tbody=document.getElementById('posBody');
-  const cards=document.getElementById('posCards');
-
-  let tableHTML='', cardsHTML='';
+  let tRows='', mCards='';
   posRows.forEach((r,i)=>{
-    const end  =(r.start||0)-(r.sold||0)-(r.comps||0);
-    const next =end+(r.refill||0);
-    const inc  =(r.sold||0)*r.price;
-    // table row
-    tableHTML+=`<tr>
-      <td class="td-lbl">${r.name}</td>
-      <td class="td-acc">${fmt(r.price)}</td>
-      <td><input type="number" class="pi" min="0" value="${r.start||0}"
-           style="color:var(--blue)" oninput="posRows[${i}].start=+this.value||0;renderPOS()"></td>
-      <td><input type="number" class="pi" min="0" value="${r.sold||0}"
-           style="color:var(--warn)" oninput="posRows[${i}].sold=+this.value||0;renderPOS()"></td>
-      <td><input type="number" class="pi" min="0" value="${r.comps||0}"
-           style="color:var(--pur)" oninput="posRows[${i}].comps=+this.value||0;renderPOS()"></td>
-      <td class="${end<0?'td-neg':'td-dim'}">${end}</td>
-      <td><input type="number" class="pi" min="0" value="${r.refill||0}"
-           style="color:var(--grn)" oninput="posRows[${i}].refill=+this.value||0;renderPOS()"></td>
-      <td style="font-weight:700;color:${next<0?'var(--red)':'var(--txt)'}">${next}</td>
-      <td class="${inc>0?'td-warn':'td-dim'}">${fmt(inc)}</td>
+    const end =(r.start||0)-(r.sold||0)-(r.comps||0);
+    const next=end+(r.refill||0);
+    const inc =(r.sold||0)*r.price;
+    const endC=end<0?'tn':'td';
+    const nexC=next<0?'color:var(--red)':'color:var(--txt)';
+    tRows+=`<tr>
+      <td class="tl">${r.name}</td>
+      <td class="ta">${fmt(r.price)}</td>
+      <td><input type="number" class="pi" min="0" value="${r.start||0}" style="color:var(--blue)"
+           oninput="posRows[${i}].start=+this.value||0;renderPOS()"></td>
+      <td><input type="number" class="pi" min="0" value="${r.sold||0}" style="color:var(--warn)"
+           oninput="posRows[${i}].sold=+this.value||0;renderPOS()"></td>
+      <td><input type="number" class="pi" min="0" value="${r.comps||0}" style="color:var(--pur)"
+           oninput="posRows[${i}].comps=+this.value||0;renderPOS()"></td>
+      <td class="${endC}">${end}</td>
+      <td><input type="number" class="pi" min="0" value="${r.refill||0}" style="color:var(--grn)"
+           oninput="posRows[${i}].refill=+this.value||0;renderPOS()"></td>
+      <td style="font-weight:700;${nexC}">${next}</td>
+      <td class="${inc>0?'tw':'td'}">${fmt(inc)}</td>
     </tr>`;
-    // mobile card
-    cardsHTML+=`<div class="item-card">
-      <div class="item-card-name">${r.name} <span style="color:var(--acc);font-size:11px">${fmt(r.price)}</span></div>
-      <div class="item-card-grid">
-        <div class="icg-field"><label>Start</label>
-          <input type="number" class="pi" min="0" value="${r.start||0}"
-                 style="width:100%;color:var(--blue)" oninput="posRows[${i}].start=+this.value||0;renderPOS()">
-        </div>
-        <div class="icg-field"><label>Sold</label>
-          <input type="number" class="pi" min="0" value="${r.sold||0}"
-                 style="width:100%;color:var(--warn)" oninput="posRows[${i}].sold=+this.value||0;renderPOS()">
-        </div>
-        <div class="icg-field"><label>Comps</label>
-          <input type="number" class="pi" min="0" value="${r.comps||0}"
-                 style="width:100%;color:var(--pur)" oninput="posRows[${i}].comps=+this.value||0;renderPOS()">
-        </div>
-        <div class="icg-field"><label>Refill</label>
-          <input type="number" class="pi" min="0" value="${r.refill||0}"
-                 style="width:100%;color:var(--grn)" oninput="posRows[${i}].refill=+this.value||0;renderPOS()">
-        </div>
-        <div class="icg-field"><label>End</label>
-          <div class="icg-val ${end<0?'neg':'td-dim'}">${end}</div>
-        </div>
-        <div class="icg-field"><label>Next</label>
-          <div class="icg-val ${next<0?'neg':''}" style="${next>0?'color:var(--txt)':''}">${next}</div>
-        </div>
+    mCards+=`<div class="m-card">
+      <div class="mc-name"><span>${r.name}</span><span class="ta" style="font-size:11px">${fmt(r.price)}</span></div>
+      <div class="mc-grid">
+        <div class="mcf"><label>Start</label><input type="number" class="pi" min="0" value="${r.start||0}"
+             style="width:100%;color:var(--blue)" oninput="posRows[${i}].start=+this.value||0;renderPOS()"></div>
+        <div class="mcf"><label>Sold</label><input type="number" class="pi" min="0" value="${r.sold||0}"
+             style="width:100%;color:var(--warn)" oninput="posRows[${i}].sold=+this.value||0;renderPOS()"></div>
+        <div class="mcf"><label>Comps</label><input type="number" class="pi" min="0" value="${r.comps||0}"
+             style="width:100%;color:var(--pur)" oninput="posRows[${i}].comps=+this.value||0;renderPOS()"></div>
+        <div class="mcf"><label>Refill</label><input type="number" class="pi" min="0" value="${r.refill||0}"
+             style="width:100%;color:var(--grn)" oninput="posRows[${i}].refill=+this.value||0;renderPOS()"></div>
+        <div class="mcf"><label>End</label><div style="font-family:'DM Mono';font-size:13px;padding:7px 6px;color:${end<0?'var(--red)':'var(--mut)'}">${end}</div></div>
+        <div class="mcf"><label>Next</label><div style="font-family:'DM Mono';font-size:13px;padding:7px 6px;font-weight:700;color:${next<0?'var(--red)':'var(--txt)'}">${next}</div></div>
       </div>
-      ${inc>0?`<div style="font-family:'DM Mono';font-size:11px;color:var(--warn);margin-top:6px;text-align:right">Income: ${fmt(inc)}</div>`:''}
+      ${inc>0?`<div style="text-align:right;font-family:'DM Mono';font-size:11px;color:var(--warn);margin-top:6px;padding-top:6px;border-top:1px solid var(--bdr)">Income: ${fmt(inc)}</div>`:''}
     </div>`;
   });
 
-  if(tbody) tbody.innerHTML=tableHTML;
-  if(cards) cards.innerHTML=cardsHTML;
+  document.getElementById('posBody').innerHTML=tRows;
+  document.getElementById('posCards').innerHTML=mCards;
 
   const total=posRows.reduce((s,r)=>s+(r.sold||0)*r.price,0);
   const gc   =gcashEntries.reduce((s,v)=>s+(parseFloat(v)||0),0);
@@ -755,8 +773,8 @@ function renderPOS(){
   const sold =posRows.filter(r=>(r.sold||0)>0).length;
 
   document.getElementById('posFoot').innerHTML=`<tr>
-    <td colspan="8" style="text-align:right;font-size:10px;color:var(--mut);font-family:'DM Sans';letter-spacing:1px;text-transform:uppercase;padding:9px">Total Income</td>
-    <td style="font-family:'Syne';font-weight:800;font-size:19px;color:var(--warn);padding:9px">${fmt(total)}</td>
+    <td colspan="8" style="text-align:right;font-size:9px;color:var(--mut);font-family:'DM Sans';letter-spacing:1px;text-transform:uppercase;padding:9px">Total Shift Income</td>
+    <td style="font-family:'Syne';font-weight:800;font-size:18px;color:var(--warn);padding:9px">${fmt(total)}</td>
   </tr>`;
   document.getElementById('cTotal').textContent=fmt(total);
   document.getElementById('cGcash').textContent=fmt(gc);
@@ -775,7 +793,7 @@ async function saveShift(){
   const date  =document.getElementById('posDate').value;
   const shift =document.getElementById('posShift').value;
   const worker=(document.getElementById('posWorker').value||currentUser||'').toUpperCase().trim()||'—';
-  const status=document.getElementById('posStatusSel').value;
+  const status=document.getElementById('posStatus').value;
   if(!date){toast('⚠ Pick a date','warn');return;}
 
   const total=posRows.reduce((s,r)=>s+(r.sold||0)*r.price,0);
@@ -790,20 +808,24 @@ async function saveShift(){
     savedAt:Date.now()
   };
 
-  try {
-    await apiPost({action:'saveShift',data:record});
-    // Update local
+  setSyncState('busy','Saving…');
+  try{
+    await api('saveShift',record);
     const idx=salesLog.findIndex(s=>s.id===record.id);
     if(idx>=0) salesLog[idx]=record; else salesLog.push(record);
-    salesLog.sort((a,b)=>a.date!==b.date?(a.date<b.date?-1:1):{AM:0,PM:1,WD:2}[a.shift]-{AM:0,PM:1,WD:2}[b.shift]);
-    showNote(`✅ ${shift} shift for ${date} saved by ${worker}.`,'ok');
+    salesLog.sort(shiftSort);
+    // Update local cache
+    const c=localStorage.getItem('tpp_cache');
+    if(c){const cd=JSON.parse(c);cd.salesLog=salesLog;localStorage.setItem('tpp_cache',JSON.stringify(cd));}
+    showNote(`✅ Saved — ${shift} · ${date} · ${worker}`,'ok');
     toast('✅ Shift saved!');
-  } catch(e){
-    toast('⚠ Save failed — check connection','err');
+    setSyncState('ok','Saved');
+  }catch(e){
+    toast('⚠ Save failed: '+e.message,'err');
+    setSyncState('err','Error');
   }
 }
 
-// GCASH
 function renderGcashUI(){
   document.getElementById('gcashList').innerHTML=gcashEntries.map((v,i)=>`
     <div class="gc-row">
@@ -814,9 +836,9 @@ function renderGcashUI(){
 }
 function addGcash(){gcashEntries.push(0);renderGcashUI();}
 
-// ══════════════════════════════════════════════════════
-//  LOGS TAB
-// ══════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════
+//  LOGS
+// ══════════════════════════════════════════════════
 function populateYearFilter(){
   const sel=document.getElementById('logYear');
   const curY=new Date().getFullYear();
@@ -829,18 +851,18 @@ function populateYearFilter(){
 
 function populateMonthFilter(){
   const year=parseInt(document.getElementById('logYear')?.value)||new Date().getFullYear();
-  const sel=document.getElementById('logMonth');
+  const sel =document.getElementById('logMonth');
   const prev=sel.value;
   const curM=today().slice(0,7);
-  const opts=[];
+  let opts='';
   for(let m=12;m>=1;m--){
     const val=`${year}-${String(m).padStart(2,'0')}`;
     const [y,mo]=val.split('-');
     const lbl=new Date(y,mo-1).toLocaleString('default',{month:'long',year:'numeric'});
     const has=salesLog.some(s=>s.date.startsWith(val));
-    opts.push(`<option value="${val}" ${val===(prev||curM)?'selected':''}>${lbl}${has?' ●':''}</option>`);
+    opts+=`<option value="${val}" ${val===(prev||curM)?'selected':''}>${lbl}${has?' ●':''}</option>`;
   }
-  sel.innerHTML=opts.join('');
+  sel.innerHTML=opts;
 }
 
 function onYearChange(){
@@ -858,15 +880,12 @@ function renderYearOverview(){
   const yS=yd.length;
   const yD=new Set(yd.map(s=>s.date)).size;
   const yA=yS?Math.round(yT/yS):0;
-
-  // Best month
   let bm='—',bv=0;
   for(let m=1;m<=12;m++){
     const mk=`${year}-${String(m).padStart(2,'0')}`;
     const mv=salesLog.filter(s=>s.date.startsWith(mk)).reduce((s,sh)=>s+(sh.totalIncome||0),0);
     if(mv>bv){bv=mv;bm=new Date(year,m-1).toLocaleString('default',{month:'short'})+' '+fmt(mv);}
   }
-
   document.getElementById('yearDash').innerHTML=[
     {l:`${year} Revenue`,v:fmt(yT),c:'var(--warn)'},
     {l:'GCash',v:fmt(yG),c:'var(--blue)'},
@@ -875,7 +894,7 @@ function renderYearOverview(){
     {l:'Shifts',v:yS,c:'var(--txt)'},
     {l:'Days',v:yD,c:'var(--txt)'},
     {l:'Best Month',v:bm,c:'var(--pur)'},
-  ].map(x=>`<div class="stat"><div class="lbl">${x.l}</div><div class="val" style="color:${x.c};font-size:16px">${x.v}</div></div>`).join('');
+  ].map(x=>`<div class="stat"><div class="lbl">${x.l}</div><div class="val" style="color:${x.c};font-size:15px">${x.v}</div></div>`).join('');
 
   const MN=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   const selM=document.getElementById('logMonth')?.value||'';
@@ -887,18 +906,16 @@ function renderYearOverview(){
     const mc=md.reduce((s,sh)=>s+(sh.cash||0),0);
     const ms=md.length;
     const isCur=mk===today().slice(0,7);
-    const isSel=mk===selM;
     const empty=!md.length;
-    return `<div class="mon-card ${empty?'empty':''} ${isSel?'active':''}"
+    return `<div class="mon-card ${empty?'empty':''} ${mk===selM?'sel':''}"
          onclick="drillMonth('${mk}')"
-         style="${isCur?'border-color:var(--acc)!important':''}">
+         style="${isCur?'border-color:var(--acc)':''}">
       <div class="mon-lbl">${mn} ${year}${isCur?' ◉':''}</div>
       <div class="mon-val" style="color:${empty?'var(--mut)':'var(--warn)'}">${empty?'—':fmt(mt)}</div>
-      ${!empty?`<div style="font-size:9px;color:var(--mut);margin-top:3px;font-family:'DM Mono'">
+      ${!empty?`<div style="font-size:9px;color:var(--mut);margin-top:2px;font-family:'DM Mono'">
         <span style="color:var(--blue)">G:${fmt(mg)}</span>
-        <span style="margin-left:5px;color:var(--acc)">C:${fmt(mc)}</span>
-      </div>
-      <div style="font-size:9px;color:var(--mut)">${ms} shift${ms!==1?'s':''}</div>`:''}
+        <span style="margin-left:4px;color:var(--acc)">C:${fmt(mc)}</span>
+      </div><div style="font-size:9px;color:var(--mut)">${ms} shift${ms!==1?'s':''}</div>`:''}
     </div>`;
   }).join('');
 }
@@ -906,7 +923,6 @@ function renderYearOverview(){
 function drillMonth(mk){
   document.getElementById('logMonth').value=mk;
   renderLogs();
-  // Re-render grid to update active state
   renderYearOverview();
   document.getElementById('monthDash').scrollIntoView({behavior:'smooth',block:'start'});
 }
@@ -928,33 +944,45 @@ function renderLogs(){
   const mLbl=new Date(y,mo-1).toLocaleString('default',{month:'long',year:'numeric'});
 
   document.getElementById('monthDash').innerHTML=[
-    {l:'Month',v:mLbl,c:'var(--txt)',fs:'13px'},
+    {l:mLbl,v:'',show:false},
     {l:'Revenue',v:fmt(mT),c:'var(--warn)'},
     {l:'GCash',v:fmt(mG),c:'var(--blue)'},
     {l:'Cash',v:fmt(mC),c:'var(--acc)'},
     {l:'Avg/Shift',v:fmt(mS?Math.round(mT/mS):0),c:'var(--blue)'},
     {l:'Shifts',v:mS,c:'var(--txt)'},
     {l:'Days',v:mD,c:'var(--txt)'},
-  ].map(x=>`<div class="dchip"><div class="lbl">${x.l}</div>
-    <div class="val" style="color:${x.c};${x.fs?'font-size:'+x.fs:'font-size:18px'}">${x.v}</div></div>`).join('');
+  ].filter(x=>x.v!==undefined&&x.l!==mLbl||x.show!==false).map(x=>
+    x.l===mLbl?`<div class="dc" style="grid-column:1/-1"><div class="lbl">Month</div><div class="val" style="font-size:14px;color:var(--txt)">${mLbl}</div></div>`
+    :`<div class="dc"><div class="lbl">${x.l}</div><div class="val" style="color:${x.c||'var(--txt)'};font-size:16px">${x.v}</div></div>`
+  ).join('');
+
+  // Simpler month dash
+  document.getElementById('monthDash').innerHTML=`
+    <div class="dc"><div class="lbl">Month</div><div class="val" style="font-size:13px;color:var(--txt)">${mLbl}</div></div>
+    <div class="dc"><div class="lbl">Revenue</div><div class="val" style="color:var(--warn)">${fmt(mT)}</div></div>
+    <div class="dc"><div class="lbl">GCash</div><div class="val" style="color:var(--blue)">${fmt(mG)}</div></div>
+    <div class="dc"><div class="lbl">Cash</div><div class="val" style="color:var(--acc)">${fmt(mC)}</div></div>
+    <div class="dc"><div class="lbl">Avg/Shift</div><div class="val" style="color:var(--blue)">${fmt(mS?Math.round(mT/mS):0)}</div></div>
+    <div class="dc"><div class="lbl">Shifts</div><div class="val">${mS}</div></div>
+    <div class="dc"><div class="lbl">Days</div><div class="val">${mD}</div></div>`;
 
   const disp=[...list].reverse();
   const tb=document.getElementById('logsBody');
   if(!disp.length){
-    tb.innerHTML=`<tr><td colspan="10" style="text-align:center;color:var(--mut);padding:28px;font-family:'DM Sans'">No shifts for ${mLbl}.</td></tr>`;
+    tb.innerHTML=`<tr><td colspan="10" style="text-align:center;color:var(--mut);padding:24px;font-family:'DM Sans'">No shifts for ${mLbl}.</td></tr>`;
     return;
   }
   tb.innerHTML=disp.map((s,i)=>`<tr>
-    <td class="td-dim">${disp.length-i}</td>
+    <td class="td">${disp.length-i}</td>
     <td>${s.date}</td>
     <td><span class="bdg b-${s.shift.toLowerCase()}">${s.shift}</span></td>
-    <td class="td-lbl">${s.worker}</td>
+    <td class="tl">${s.worker}</td>
     <td><span class="bdg ${s.status==='Ready'?'b-done':'b-pend'}">${s.status||'Pending'}</span></td>
     <td>${s.itemsSold||0}</td>
-    <td class="td-warn">${fmt(s.totalIncome)}</td>
-    <td class="td-blue">${fmt(s.gcash)}</td>
+    <td class="tw">${fmt(s.totalIncome)}</td>
+    <td class="tbl">${fmt(s.gcash)}</td>
     <td style="color:var(--acc)">${fmt(s.cash)}</td>
-    <td style="display:flex;gap:4px;flex-wrap:nowrap">
+    <td style="display:flex;gap:3px;flex-wrap:nowrap">
       <button class="btn btn-ghost btn-sm" onclick='viewShift("${s.id}")'>👁</button>
       <button class="btn btn-blue btn-sm" onclick='editShift("${s.id}")'>✏️</button>
       <button class="btn btn-red btn-sm" onclick='delShift("${s.id}")'>×</button>
@@ -964,96 +992,88 @@ function renderLogs(){
 
 function viewShift(id){
   const s=salesLog.find(x=>x.id===id);if(!s)return;
-  document.getElementById('modalTitle').textContent=`${s.shift} — ${s.date} — ${s.worker}`;
+  document.getElementById('modalTitle').textContent=`${s.shift} · ${s.date} · ${s.worker}`;
   const rows=(s.rows||[]).filter(r=>r.start||r.sold||r.comps||r.refill);
-  const rHtml=rows.length?rows.map(r=>{
+  const rH=rows.length?rows.map(r=>{
     const end=(r.start||0)-(r.sold||0)-(r.comps||0);
     const next=end+(r.refill||0);
     const inc=(r.sold||0)*r.price;
     return `<tr>
-      <td class="td-lbl">${r.name}</td><td class="td-acc">${fmt(r.price)}</td>
+      <td class="tl">${r.name}</td><td class="ta">${fmt(r.price)}</td>
       <td style="color:var(--blue)">${r.start||0}</td>
       <td style="color:var(--warn)">${r.sold||0}</td>
       <td style="color:var(--pur)">${r.comps||0}</td>
-      <td class="${end<0?'td-neg':'td-dim'}">${end}</td>
+      <td class="${(r.start||0)-(r.sold||0)-(r.comps||0)<0?'tn':'td'}">${(r.start||0)-(r.sold||0)-(r.comps||0)}</td>
       <td style="color:var(--grn)">${r.refill||0}</td>
-      <td style="font-weight:700;color:${next<0?'var(--red)':'var(--txt)'}">${next}</td>
-      <td class="${inc>0?'td-warn':'td-dim'}">${fmt(inc)}</td>
+      <td style="font-weight:700;color:var(--txt)">${end+(r.refill||0)}</td>
+      <td class="${inc>0?'tw':'td'}">${fmt(inc)}</td>
     </tr>`;
-  }).join(''):`<tr><td colspan="9" style="text-align:center;color:var(--mut);padding:16px">No items entered.</td></tr>`;
+  }).join(''):`<tr><td colspan="9" style="text-align:center;color:var(--mut);padding:14px">No items entered.</td></tr>`;
 
-  const gcHtml=(s.gcashEntries||[]).length
-    ? s.gcashEntries.map((v,i)=>`<div style="font-family:'DM Mono';color:var(--blue);padding:2px 0;font-size:11px">Entry ${i+1}: ${fmt(v)}</div>`).join('')
-    : '<div style="color:var(--mut);font-size:11px">No GCash entries</div>';
+  const gcH=(s.gcashEntries||[]).length
+    ?s.gcashEntries.map((v,i)=>`<div style="font-family:'DM Mono';color:var(--blue);padding:2px 0;font-size:11px">Entry ${i+1}: ${fmt(v)}</div>`).join('')
+    :'<div style="color:var(--mut);font-size:11px">No GCash entries</div>';
 
   document.getElementById('modalBody').innerHTML=`
-    <div class="stats" style="margin-bottom:12px">
+    <div class="stats" style="margin-bottom:11px">
       <div class="stat"><div class="lbl">Total</div><div class="val" style="color:var(--warn)">${fmt(s.totalIncome)}</div></div>
       <div class="stat"><div class="lbl">GCash</div><div class="val" style="color:var(--blue)">${fmt(s.gcash)}</div></div>
       <div class="stat"><div class="lbl">Cash</div><div class="val" style="color:var(--acc)">${fmt(s.cash)}</div></div>
     </div>
-    <div class="tbl-wrap" style="margin-bottom:12px">
-      <table>
-        <thead><tr>
-          <th>Item</th><th>Price</th>
-          <th style="color:var(--blue)">Start</th>
-          <th style="color:var(--warn)">Sold</th>
-          <th style="color:var(--pur)">Comps</th>
-          <th style="color:var(--mut2)">End</th>
-          <th style="color:var(--grn)">Refill</th>
-          <th>Next</th><th style="color:var(--warn)">Income</th>
-        </tr></thead>
-        <tbody>${rHtml}</tbody>
-      </table>
+    <div class="tbl-wrap" style="margin-bottom:11px">
+      <table><thead><tr>
+        <th>Item</th><th>Price</th>
+        <th style="color:var(--blue)">Start</th><th style="color:var(--warn)">Sold</th>
+        <th style="color:var(--pur)">Comps</th><th style="color:var(--mut2)">End</th>
+        <th style="color:var(--grn)">Refill</th><th>Next</th><th style="color:var(--warn)">Income</th>
+      </tr></thead><tbody>${rH}</tbody></table>
     </div>
-    <div><div class="sec" style="margin-bottom:6px">GCash Breakdown</div>${gcHtml}</div>`;
+    <div class="sec">GCash Breakdown</div>${gcH}`;
   document.getElementById('shiftModal').classList.add('open');
 }
 
 function editShift(id){
   const s=salesLog.find(x=>x.id===id);if(!s)return;
-  document.getElementById('posDate').value    =s.date;
-  document.getElementById('posShift').value   =s.shift;
-  document.getElementById('posWorker').value  =s.worker;
-  document.getElementById('posStatusSel').value=s.status||'Pending';
+  document.getElementById('posDate').value   =s.date;
+  document.getElementById('posShift').value  =s.shift;
+  document.getElementById('posWorker').value =s.worker;
+  document.getElementById('posStatus').value =s.status||'Pending';
   posRows=products.map(p=>{
     const r=(s.rows||[]).find(x=>x.name===p.name);
     return r?{...r}:{name:p.name,price:p.price,start:0,sold:0,comps:0,refill:0};
   });
   gcashEntries=[...(s.gcashEntries||[])];
   renderPOS();renderGcashUI();
-  showNote(`✏️ Editing ${s.shift} shift for ${s.date}. Save to update.`,'warn');
+  showNote(`✏️ Editing ${s.shift} · ${s.date} — save to update`,'warn');
   switchTab('daily');closeModal();
 }
 
 async function delShift(id){
-  if(!confirm('Delete this shift record?'))return;
+  if(!confirm('Delete this shift?'))return;
   try{
-    await apiPost({action:'deleteShift',id});
+    await api('deleteShift',{id});
     salesLog=salesLog.filter(s=>s.id!==id);
     renderYearOverview();renderLogs();
-    toast('Shift deleted.');
-  }catch(e){toast('⚠ Delete failed','err');}
+    toast('Deleted.');
+  }catch(e){toast('⚠ '+e.message,'err');}
 }
 
 async function clearAllLogs(){
   if(!confirm('Delete ALL shift logs? Cannot be undone.'))return;
   try{
-    await apiPost({action:'clearShifts'});
+    await api('clearShifts',{});
     salesLog=[];
     renderYearOverview();renderLogs();
     toast('All logs cleared.');
-  }catch(e){toast('⚠ Failed','err');}
+  }catch(e){toast('⚠ '+e.message,'err');}
 }
 
 function closeModal(){document.getElementById('shiftModal').classList.remove('open');}
-document.getElementById('shiftModal').addEventListener('click',e=>{
-  if(e.target===document.getElementById('shiftModal'))closeModal();
-});
+document.getElementById('shiftModal').addEventListener('click',e=>{if(e.target===document.getElementById('shiftModal'))closeModal();});
 
-// ══════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════
 //  STOCK ROOM
-// ══════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════
 function syncStockSelect(){
   document.getElementById('stItem').innerHTML=products.map(p=>`<option value="${p.name}">${p.name}</option>`).join('');
 }
@@ -1072,12 +1092,12 @@ async function addStock(){
     date,item,action,qty,remaining:action==='IN'?prevBal+qty:prevBal-qty,takenBy:by,note:''
   };
   try{
-    await apiPost({action:'saveStock',data:entry});
+    await api('saveStock',entry);
     stockMov.push(entry);
     renderStockTable();
     toast(`✅ ${action} ${qty}× ${item}`);
     document.getElementById('stQty').value=1;
-  }catch(e){toast('⚠ Failed to save','err');}
+  }catch(e){toast('⚠ '+e.message,'err');}
 }
 
 function renderStockTable(){
@@ -1085,33 +1105,29 @@ function renderStockTable(){
   const all=[...stockMov].reverse();
   const lst=q?all.filter(e=>e.item.toLowerCase().includes(q)||e.date.includes(q)||(e.takenBy||'').toLowerCase().includes(q)):all;
   const tb =document.getElementById('stBody');
-  if(!lst.length){tb.innerHTML=`<tr><td colspan="8" style="text-align:center;color:var(--mut);padding:24px">No transactions yet.</td></tr>`;return;}
+  if(!lst.length){tb.innerHTML=`<tr><td colspan="8" style="text-align:center;color:var(--mut);padding:22px">No transactions yet.</td></tr>`;return;}
   tb.innerHTML=lst.map((e,i)=>`<tr>
-    <td class="td-dim">${lst.length-i}</td>
-    <td>${e.date}</td>
-    <td class="td-lbl">${e.item}</td>
+    <td class="td">${lst.length-i}</td><td>${e.date}</td>
+    <td class="tl">${e.item}</td>
     <td><span class="bdg b-${e.action.toLowerCase()}">${e.action}</span></td>
     <td>${e.qty}</td>
-    <td class="${e.remaining<0?'td-neg':'td-pos'}">${e.remaining}</td>
-    <td class="td-dim">${e.takenBy||'—'}</td>
+    <td class="${e.remaining<0?'tn':'tp'}">${e.remaining}</td>
+    <td class="td">${e.takenBy||'—'}</td>
     <td><button class="btn btn-red btn-sm" onclick='delStock("${e.id}")'>×</button></td>
   </tr>`).join('');
 }
 
 async function delStock(id){
   if(!confirm('Delete?'))return;
-  try{
-    await apiPost({action:'deleteStock',id});
-    stockMov=stockMov.filter(e=>e.id!==id);
-    renderStockTable();
-  }catch(e){toast('⚠ Failed','err');}
+  try{await api('deleteStock',{id});stockMov=stockMov.filter(e=>e.id!==id);renderStockTable();}
+  catch(e){toast('⚠ '+e.message,'err');}
 }
 
-// ══════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════
 //  LIVE INVENTORY
-// ══════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════
 function renderLive(){
-  const q =(document.getElementById('liveSearch')?.value||'').toLowerCase();
+  const q =document.getElementById('liveSearch')?.value.toLowerCase()||'';
   const ls=q?products.filter(p=>p.name.toLowerCase().includes(q)):products;
   const tb=document.getElementById('liveBody');
   tb.innerHTML='';
@@ -1123,31 +1139,29 @@ function renderLive(){
     salesLog.forEach(sh=>{const r=(sh.rows||[]).find(r=>r.name===p.name);if(r){sold+=(r.sold||0);comps+=(r.comps||0);}});
     let startStock=0;
     if(salesLog.length){const fr=(salesLog[0].rows||[]).find(r=>r.name===p.name);if(fr)startStock=fr.start||0;}
-    const totalOut=stockOut+sold+comps;
     const remaining=startStock+totalIn-sold-comps-stockOut;
     const denom=startStock+totalIn;
     const pct=denom>0?Math.max(0,Math.min(100,(remaining/denom)*100)):0;
     const cls=pct<20?'low':pct<50?'mid':'';
     tb.innerHTML+=`<tr>
-      <td class="td-lbl">${p.name}</td>
-      <td class="td-acc">${fmt(p.price)}</td>
+      <td class="tl">${p.name}</td><td class="ta">${fmt(p.price)}</td>
       <td style="color:var(--grn)">${startStock}</td>
       <td style="color:var(--grn)">${totalIn}</td>
       <td style="color:var(--warn)">${sold}</td>
       <td style="color:var(--pur)">${comps}</td>
-      <td style="color:var(--red)">${totalOut}</td>
-      <td class="${remaining<0?'td-neg':remaining===0?'td-dim':'td-pos'}">${remaining}</td>
+      <td style="color:var(--red)">${stockOut}</td>
+      <td class="${remaining<0?'tn':remaining===0?'td':'tp'}">${remaining}</td>
       <td><div class="prg">
-        <div class="prg-track"><div class="prg-fill ${cls}" style="width:${pct}%"></div></div>
-        <span style="font-size:9px;color:var(--mut);min-width:28px">${Math.round(pct)}%</span>
+        <div class="prg-t"><div class="prg-f ${cls}" style="width:${pct}%"></div></div>
+        <span style="font-size:9px;color:var(--mut);min-width:26px">${Math.round(pct)}%</span>
       </div></td>
     </tr>`;
   });
 }
 
-// ══════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════
 //  LOYALTY
-// ══════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════
 async function saveLoyalty(){
   const cardNum=(document.getElementById('lcNum').value||'').toUpperCase().trim();
   const name   =document.getElementById('lcName').value.trim();
@@ -1156,33 +1170,32 @@ async function saveLoyalty(){
     stickers:parseInt(document.getElementById('lcStickers').value)||0,
     reward:document.getElementById('lcReward').value};
   try{
-    await apiPost({action:'saveLoyalty',data:card});
+    await api('saveLoyalty',card);
     const idx=loyCards.findIndex(c=>c.cardNum===cardNum);
     if(idx>=0) loyCards[idx]=card; else loyCards.push(card);
     renderLoyalty();toast('✅ Card saved');
     ['lcNum','lcName','lcExpiry'].forEach(id=>document.getElementById(id).value='');
     document.getElementById('lcStickers').value=0;
     document.getElementById('lcReward').value='None';
-  }catch(e){toast('⚠ Failed','err');}
+  }catch(e){toast('⚠ '+e.message,'err');}
 }
 
 function renderLoyalty(){
   const q =(document.getElementById('lcSearch')?.value||'').toLowerCase();
   const ls=q?loyCards.filter(c=>c.name.toLowerCase().includes(q)||c.cardNum.toLowerCase().includes(q)):loyCards;
   const tb=document.getElementById('lcBody');
-  if(!ls.length){tb.innerHTML=`<tr><td colspan="7" style="text-align:center;color:var(--mut);padding:24px">No cards yet.</td></tr>`;return;}
+  if(!ls.length){tb.innerHTML=`<tr><td colspan="7" style="text-align:center;color:var(--mut);padding:22px">No cards yet.</td></tr>`;return;}
   const G=10;
   tb.innerHTML=ls.map(c=>{
     const pct=Math.min(100,(c.stickers/G)*100);
-    const rc=c.reward==='Pending Claim'?'b-pend':c.reward==='Claimed'?'b-done':'td-dim';
+    const rc=c.reward==='Pending Claim'?'b-pend':c.reward==='Claimed'?'b-done':'td';
     return `<tr>
       <td style="font-family:'DM Mono';color:var(--acc)">${c.cardNum}</td>
-      <td class="td-lbl">${c.name}</td>
-      <td class="td-dim">${c.expiry||'—'}</td>
+      <td class="tl">${c.name}</td><td class="td">${c.expiry||'—'}</td>
       <td style="font-family:'DM Mono'">${c.stickers}</td>
       <td><span class="bdg ${rc}">${c.reward}</span></td>
       <td><div class="prg">
-        <div class="prg-track"><div class="prg-fill" style="width:${pct}%;background:var(--pur)"></div></div>
+        <div class="prg-t"><div class="prg-f" style="width:${pct}%;background:var(--pur)"></div></div>
         <span style="font-size:9px;color:var(--mut)">${c.stickers}/${G}</span>
       </div></td>
       <td style="display:flex;gap:4px">
@@ -1192,126 +1205,82 @@ function renderLoyalty(){
     </tr>`;
   }).join('');
 }
-
 function editCard(num){
   const c=loyCards.find(x=>x.cardNum===num);if(!c)return;
-  document.getElementById('lcNum').value     =c.cardNum;
-  document.getElementById('lcName').value    =c.name;
-  document.getElementById('lcExpiry').value  =c.expiry||'';
-  document.getElementById('lcStickers').value=c.stickers;
-  document.getElementById('lcReward').value  =c.reward||'None';
+  document.getElementById('lcNum').value=c.cardNum;document.getElementById('lcName').value=c.name;
+  document.getElementById('lcExpiry').value=c.expiry||'';document.getElementById('lcStickers').value=c.stickers;
+  document.getElementById('lcReward').value=c.reward||'None';
 }
-
 async function delCard(num){
   if(!confirm(`Delete card ${num}?`))return;
-  try{
-    await apiPost({action:'deleteLoyalty',cardNum:num});
-    loyCards=loyCards.filter(c=>c.cardNum!==num);
-    renderLoyalty();
-  }catch(e){toast('⚠ Failed','err');}
+  try{await api('deleteLoyalty',{cardNum:num});loyCards=loyCards.filter(c=>c.cardNum!==num);renderLoyalty();}
+  catch(e){toast('⚠ '+e.message,'err');}
 }
 
-// ══════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════
 //  ITEMS
-// ══════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════
 function renderItems(){
   document.getElementById('itemsBody').innerHTML=products.map((p,i)=>`<tr>
-    <td class="td-dim">${i+1}</td>
-    <td class="td-lbl">${p.name}</td>
-    <td class="td-acc">${fmt(p.price)}</td>
-    <td><input type="number" value="${p.price}" min="0" style="width:90px;font-size:12px;padding:5px 7px"
+    <td class="td">${i+1}</td><td class="tl">${p.name}</td>
+    <td class="ta">${fmt(p.price)}</td>
+    <td><input type="number" value="${p.price}" min="0" style="width:85px;font-size:12px;padding:4px 6px"
                onchange="updatePrice('${p.name}',this.value)"></td>
     <td><button class="btn btn-red btn-sm" onclick="delItem('${p.name}')">× Remove</button></td>
   </tr>`).join('');
 }
-
 async function addItem(){
-  const name =document.getElementById('newName').value.toUpperCase().trim();
+  const name=document.getElementById('newName').value.toUpperCase().trim();
   const price=parseFloat(document.getElementById('newPrice').value)||0;
   if(!name){toast('⚠ Enter name','warn');return;}
   if(products.find(p=>p.name===name)){toast('⚠ Already exists','warn');return;}
   const p={name,price};
   try{
-    await apiPost({action:'saveProduct',data:p});
+    await api('saveProduct',p);
     products.push(p);
-    document.getElementById('newName').value='';
-    document.getElementById('newPrice').value='';
+    document.getElementById('newName').value='';document.getElementById('newPrice').value='';
     renderItems();syncStockSelect();
     posRows.push({name,price,start:0,sold:0,comps:0,refill:0});
     toast(`✅ ${name} added`);
-  }catch(e){toast('⚠ Failed','err');}
+  }catch(e){toast('⚠ '+e.message,'err');}
 }
-
 async function updatePrice(name,val){
   const price=parseFloat(val)||0;
   const p=products.find(x=>x.name===name);if(!p)return;
   p.price=price;
   try{
-    await apiPost({action:'saveProduct',data:p});
+    await api('saveProduct',p);
     const r=posRows.find(x=>x.name===name);if(r)r.price=price;
     renderPOS();toast('Price updated');
-  }catch(e){toast('⚠ Failed','err');}
+  }catch(e){toast('⚠ '+e.message,'err');}
 }
-
 async function delItem(name){
   if(!confirm(`Remove "${name}"?`))return;
   try{
-    await apiPost({action:'deleteProduct',name});
+    await api('deleteProduct',{name});
     products=products.filter(p=>p.name!==name);
     posRows=posRows.filter(r=>r.name!==name);
     renderItems();renderPOS();syncStockSelect();
-    toast('Item removed');
-  }catch(e){toast('⚠ Failed','err');}
+    toast('Removed.');
+  }catch(e){toast('⚠ '+e.message,'err');}
 }
 
-// ══════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════
 //  BOOT
-// ══════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════
 (async()=>{
-  // Ask for name if not set
-  if(currentUser){
-    document.getElementById('userBadge').textContent='👤 '+currentUser;
-  }
+  if(currentUser) document.getElementById('usrBtn').textContent='👤 '+currentUser;
 
-  document.getElementById('loadMsg').textContent='Loading data from server…';
-
-  // Check if API URL is configured
-  if(API_URL==='PASTE_YOUR_WEB_APP_URL_HERE'){
-    document.getElementById('loadMsg').textContent='⚠ API URL not set — see SETUP_GUIDE.md';
-    document.getElementById('loadScreen').innerHTML+=`
-      <div style="background:#1e2430;border:1px solid #2a3445;border-radius:8px;padding:20px;max-width:360px;text-align:center">
-        <div style="color:#ffb547;font-family:'Syne',sans-serif;font-size:16px;margin-bottom:10px">Setup Required</div>
-        <div style="color:#8492aa;font-size:12px;line-height:1.6">
-          You need to connect this app to Google Sheets.<br><br>
-          Follow the <b style="color:#dde3ee">SETUP_GUIDE.md</b> included in your download.
-          It takes about 10 minutes.
-        </div>
-      </div>`;
+  if(!API_URL){
+    // No URL stored — show setup screen with input box
+    document.getElementById('setupSpin').style.display='none';
+    document.getElementById('setupMsg').textContent='Connect your Google Sheet to get started.';
+    document.getElementById('setupBox').style.display='block';
     return;
   }
 
-  try {
-    await refreshAll();
-    document.getElementById('loadScreen').style.display='none';
-    document.getElementById('stDate').value=today();
-
-    // Set active tab
-    switchTab('daily');
-
-    // Set nav active state
-    document.querySelectorAll('.tnav-btn')[0].classList.add('active');
-    document.getElementById('bn-daily').classList.add('active');
-
-    // Init POS
-    posRows=products.map(p=>({name:p.name,price:p.price,start:0,sold:0,comps:0,refill:0}));
-    syncStockSelect();
-    initPOS();
-
-    setSyncState('ok');
-  }catch(e){
-    document.getElementById('loadMsg').textContent='⚠ Could not connect to server. Check your API URL.';
-    setSyncState('err');
-  }
+  // URL exists — try to connect
+  await startApp();
 })();
 </script>
 </body>
