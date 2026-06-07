@@ -2,590 +2,427 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TPP INVENTORY SYSTEM</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>TPP INVENTORY</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap');
+:root{
+  --bg:#080a0f;--sur:#0f1218;--sur2:#161b24;--sur3:#1e2430;
+  --bdr:#1e2736;--bdr2:#2a3445;
+  --acc:#00f0a0;--acc2:rgba(0,240,160,.12);
+  --blue:#3b9eff;--blue2:rgba(59,158,255,.12);
+  --pur:#9b7fff;--pur2:rgba(155,127,255,.12);
+  --warn:#ffb547;--warn2:rgba(255,181,71,.12);
+  --red:#ff4d6a;--red2:rgba(255,77,106,.12);
+  --grn:#34d399;--txt:#dde3ee;--mut:#5a6478;--mut2:#8492aa;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{-webkit-text-size-adjust:100%;}
+body{background:var(--bg);color:var(--txt);font-family:'DM Sans',sans-serif;min-height:100vh;font-size:14px;line-height:1.5;}
 
-:root {
-  --bg: #080a0f;
-  --surface: #0f1218;
-  --surface2: #161b24;
-  --surface3: #1e2430;
-  --border: #1e2736;
-  --border2: #2a3445;
-  --accent: #00f0a0;
-  --accent-dim: rgba(0,240,160,.12);
-  --blue: #3b9eff;
-  --blue-dim: rgba(59,158,255,.12);
-  --purple: #9b7fff;
-  --warn: #ffb547;
-  --warn-dim: rgba(255,181,71,.12);
-  --danger: #ff4d6a;
-  --danger-dim: rgba(255,77,106,.12);
-  --green: #34d399;
-  --text: #dde3ee;
-  --muted: #5a6478;
-  --muted2: #8492aa;
-  --gcash: #3b9eff;
-  --cash: #00f0a0;
+/* ── HEADER ── */
+header{background:var(--sur);border-bottom:1px solid var(--bdr);height:50px;display:flex;align-items:center;padding:0 14px;gap:10px;position:sticky;top:0;z-index:200;}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:16px;letter-spacing:3px;color:var(--acc);white-space:nowrap;}
+.logo em{color:var(--mut2);font-style:normal;}
+.hdr-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:var(--mut);flex-shrink:0;}
+.sync-dot.ok{background:var(--acc);}
+.sync-dot.busy{background:var(--warn);animation:pulse .8s ease-in-out infinite;}
+.sync-dot.err{background:var(--red);}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+.user-badge{background:var(--sur2);border:1px solid var(--bdr2);border-radius:20px;padding:4px 10px;font-size:11px;color:var(--mut2);cursor:pointer;white-space:nowrap;}
+.user-badge:hover{border-color:var(--acc);color:var(--acc);}
+
+/* ── BOTTOM NAV (mobile) ── */
+.bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--sur);border-top:1px solid var(--bdr);z-index:200;padding-bottom:env(safe-area-inset-bottom);}
+.bottom-nav-inner{display:flex;}
+.bnav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 4px;border:none;background:none;color:var(--mut);font-size:9px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;cursor:pointer;font-family:'DM Sans',sans-serif;transition:color .15s;}
+.bnav-btn .ico{font-size:18px;line-height:1;}
+.bnav-btn.active{color:var(--acc);}
+/* Desktop top nav */
+.top-nav{display:flex;gap:1px;overflow-x:auto;flex:1;}
+.top-nav::-webkit-scrollbar{display:none;}
+.tnav-btn{background:none;border:none;color:var(--mut);font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;padding:0 12px;height:50px;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;transition:color .15s,border-color .15s;}
+.tnav-btn:hover{color:var(--txt);}
+.tnav-btn.active{color:var(--acc);border-bottom-color:var(--acc);}
+
+/* ── LAYOUT ── */
+main{padding:14px;max-width:1700px;margin:0 auto;padding-bottom:80px;}
+.tab-content{display:none;}
+.tab-content.active{display:block;animation:fi .18s;}
+@keyframes fi{from{opacity:0;transform:translateY(3px);}to{opacity:1;transform:none;}}
+
+/* ── CARDS ── */
+.card{background:var(--sur);border:1px solid var(--bdr);border-radius:8px;padding:14px 16px;margin-bottom:14px;}
+.sec{font-family:'Syne',sans-serif;font-weight:700;font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--mut2);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.sec::after{content:'';flex:1;height:1px;background:var(--bdr);}
+
+/* ── FORM ── */
+label{display:block;font-size:10px;font-weight:600;color:var(--mut);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;}
+input,select,textarea{width:100%;background:var(--sur2);border:1px solid var(--bdr2);border-radius:5px;color:var(--txt);font-family:'DM Sans',sans-serif;font-size:14px;padding:9px 11px;outline:none;transition:border-color .15s;-webkit-appearance:none;}
+input:focus,select:focus{border-color:var(--acc);background:var(--sur3);}
+input[type=number]{font-family:'DM Mono',monospace;font-size:13px;}
+select option{background:var(--sur2);}
+/* Bigger touch targets on mobile */
+@media(max-width:768px){
+  input,select{padding:11px 12px;font-size:15px;}
+  input[type=number]{font-size:14px;}
 }
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:9px 16px;border-radius:6px;border:none;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;cursor:pointer;transition:all .15s;white-space:nowrap;min-height:38px;}
+.btn-acc{background:var(--acc);color:#000;}.btn-acc:hover{background:#00ffb3;box-shadow:0 0 14px rgba(0,240,160,.3);}
+.btn-blue{background:var(--blue2);color:var(--blue);border:1px solid rgba(59,158,255,.25);}.btn-blue:hover{background:rgba(59,158,255,.2);}
+.btn-ghost{background:var(--sur2);color:var(--mut2);border:1px solid var(--bdr2);}.btn-ghost:hover{color:var(--txt);border-color:var(--mut);}
+.btn-red{background:var(--red2);color:var(--red);border:1px solid rgba(255,77,106,.2);}.btn-red:hover{background:rgba(255,77,106,.22);}
+.btn-sm{padding:5px 10px;font-size:10px;min-height:28px;}
+.btn-full{width:100%;}
+@media(max-width:768px){.btn{min-height:44px;font-size:13px;}.btn-sm{min-height:36px;font-size:11px;}}
 
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'DM Sans', sans-serif;
-  min-height: 100vh;
-  font-size: 13px;
-  line-height: 1.5;
+/* ── TABLES (desktop) ── */
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+table{width:100%;border-collapse:collapse;}
+th{background:var(--sur2);color:var(--mut);font-family:'DM Mono',monospace;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;padding:7px 9px;text-align:left;border-bottom:1px solid var(--bdr2);white-space:nowrap;}
+td{padding:7px 9px;border-bottom:1px solid rgba(30,39,54,.6);font-family:'DM Mono',monospace;font-size:12px;vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(255,255,255,.012);}
+.td-lbl{font-family:'DM Sans',sans-serif;font-weight:500;font-size:13px;}
+.td-acc{color:var(--acc);}.td-warn{color:var(--warn);font-weight:700;}
+.td-neg{color:var(--red);}.td-pos{color:var(--grn);}
+.td-dim{color:var(--mut);}.td-blue{color:var(--blue);}
+
+/* ── POS INPUT CELLS ── */
+.pi{width:60px;padding:4px 5px;text-align:right;font-size:12px;min-height:auto;}
+@media(max-width:768px){.pi{width:52px;font-size:12px;padding:5px 4px;}}
+
+/* ── MOBILE CARD LIST (replaces table on phone) ── */
+.item-cards{display:none;}
+.item-card{background:var(--sur2);border:1px solid var(--bdr2);border-radius:7px;padding:12px 14px;margin-bottom:8px;}
+.item-card-name{font-weight:600;font-size:14px;margin-bottom:8px;}
+.item-card-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.icg-field label{font-size:9px;color:var(--mut);text-transform:uppercase;letter-spacing:.6px;margin-bottom:2px;}
+.icg-val{font-family:'DM Mono',monospace;font-size:12px;color:var(--txt);}
+.icg-val.acc{color:var(--acc);}.icg-val.warn{color:var(--warn);}.icg-val.neg{color:var(--red);}
+
+/* ── STATS STRIP ── */
+.stats{display:flex;gap:8px;flex-wrap:wrap;}
+.stat{background:var(--sur2);border:1px solid var(--bdr2);border-radius:7px;padding:10px 13px;flex:1;min-width:100px;}
+.stat .lbl{font-size:9px;color:var(--mut);text-transform:uppercase;letter-spacing:.8px;margin-bottom:1px;}
+.stat .val{font-family:'Syne',sans-serif;font-weight:800;font-size:20px;}
+
+/* ── BADGES ── */
+.bdg{display:inline-block;padding:2px 7px;border-radius:3px;font-family:'DM Mono',monospace;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;}
+.b-am{background:rgba(0,240,160,.15);color:var(--acc);}
+.b-pm{background:rgba(59,158,255,.15);color:var(--blue);}
+.b-wd{background:rgba(155,127,255,.15);color:var(--pur);}
+.b-in{background:rgba(52,211,153,.15);color:var(--grn);}
+.b-out{background:rgba(255,77,106,.15);color:var(--red);}
+.b-pend{background:rgba(255,181,71,.15);color:var(--warn);}
+.b-done{background:rgba(0,240,160,.15);color:var(--acc);}
+
+/* ── MODAL ── */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:500;align-items:flex-end;justify-content:center;padding:0;}
+.modal-bg.open{display:flex;}
+.modal-box{background:var(--sur);border:1px solid var(--bdr2);border-radius:12px 12px 0 0;padding:20px;width:100%;max-width:800px;max-height:90vh;overflow-y:auto;}
+@media(min-width:600px){
+  .modal-bg{align-items:center;padding:16px;}
+  .modal-box{border-radius:12px;max-height:88vh;}
+}
+.modal-hd{font-family:'Syne',sans-serif;font-weight:800;font-size:16px;color:var(--acc);margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;}
+.modal-close{background:none;border:none;color:var(--mut);font-size:24px;cursor:pointer;padding:0 4px;line-height:1;}
+
+/* ── NOTEBOX ── */
+.note{font-size:12px;padding:9px 12px;border-radius:5px;margin-bottom:10px;display:none;font-family:'DM Sans',sans-serif;}
+.note.info{background:var(--blue2);color:var(--blue);border:1px solid rgba(59,158,255,.2);}
+.note.warn{background:var(--warn2);color:var(--warn);border:1px solid rgba(255,181,71,.2);}
+.note.ok{background:var(--acc2);color:var(--acc);border:1px solid rgba(0,240,160,.2);}
+
+/* ── PROGRESS BAR ── */
+.prg{display:flex;align-items:center;gap:6px;}
+.prg-track{flex:1;height:4px;background:var(--bdr2);border-radius:2px;overflow:hidden;}
+.prg-fill{height:100%;border-radius:2px;background:var(--acc);}
+.prg-fill.mid{background:var(--warn);}.prg-fill.low{background:var(--red);}
+
+/* ── MONTHLY GRID ── */
+.mon-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-bottom:16px;}
+.mon-card{background:var(--sur2);border:1px solid var(--bdr);border-radius:7px;padding:11px 12px;cursor:pointer;transition:border-color .15s;}
+.mon-card:hover,.mon-card.active{border-color:var(--acc);}
+.mon-card.empty{opacity:.4;}
+.mon-lbl{font-family:'DM Mono',monospace;font-size:9px;color:var(--mut);letter-spacing:.8px;margin-bottom:3px;}
+.mon-val{font-family:'Syne',sans-serif;font-weight:800;font-size:15px;}
+
+/* ── DASH GRID ── */
+.dash{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;margin-bottom:14px;}
+.dchip{background:var(--sur2);border:1px solid var(--bdr2);border-radius:7px;padding:10px 12px;}
+.dchip .lbl{font-size:9px;color:var(--mut);text-transform:uppercase;letter-spacing:.7px;}
+.dchip .val{font-family:'Syne',sans-serif;font-weight:800;font-size:18px;}
+
+/* ── GCASH ── */
+.gc-row{display:flex;gap:6px;align-items:center;margin-bottom:6px;}
+.gc-row input{flex:1;border-left:3px solid var(--blue);}
+
+/* ── LOADING SCREEN ── */
+#loadScreen{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:999;}
+#loadScreen .logo-big{font-family:'Syne',sans-serif;font-weight:800;font-size:32px;letter-spacing:6px;color:var(--acc);}
+#loadScreen .logo-big em{color:var(--mut2);font-style:normal;}
+.spin{width:24px;height:24px;border:2px solid var(--bdr2);border-top-color:var(--acc);border-radius:50%;animation:sp .6s linear infinite;}
+@keyframes sp{to{transform:rotate(360deg);}}
+#loadMsg{font-size:12px;color:var(--mut);font-family:'DM Sans',sans-serif;}
+
+/* ── TOAST ── */
+#toast{position:fixed;bottom:70px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--sur);border:1px solid var(--acc);border-radius:6px;padding:9px 18px;font-size:12px;color:var(--acc);font-family:'DM Sans',sans-serif;font-weight:600;opacity:0;transition:all .25s;z-index:999;pointer-events:none;white-space:nowrap;}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+@media(min-width:600px){#toast{bottom:24px;}}
+
+/* ── GRID HELPERS ── */
+.row{display:flex;gap:12px;flex-wrap:wrap;}.col{flex:1;min-width:140px;}
+hr{border:none;border-top:1px solid var(--bdr);margin:12px 0;}
+
+/* ── MOBILE: show card list instead of table for POS ── */
+@media(max-width:700px){
+  .pos-desktop{display:none;}
+  .item-cards{display:block;}
+  main{padding:10px;padding-bottom:90px;}
+  .logo{font-size:14px;letter-spacing:2px;}
+}
+@media(min-width:701px){
+  .bottom-nav{display:none;}
+  .top-nav{display:flex;}
+}
+@media(max-width:700px){
+  .top-nav{display:none;}
+  .bottom-nav{display:block;}
 }
 
-/* ─── HEADER ─── */
-header {
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  height: 52px;
-  display: flex;
-  align-items: center;
-  padding: 0 20px;
-  gap: 0;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-
-.logo {
-  font-family: 'Syne', sans-serif;
-  font-weight: 800;
-  font-size: 18px;
-  letter-spacing: 4px;
-  color: var(--accent);
-  text-transform: uppercase;
-  white-space: nowrap;
-  margin-right: 20px;
-}
-.logo em { color: var(--muted2); font-style: normal; }
-
-nav { display: flex; gap: 1px; overflow-x: auto; }
-nav::-webkit-scrollbar { display: none; }
-
-nav button {
-  background: none;
-  border: none;
-  color: var(--muted);
-  font-family: 'DM Sans', sans-serif;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  padding: 0 14px;
-  height: 52px;
-  cursor: pointer;
-  white-space: nowrap;
-  border-bottom: 2px solid transparent;
-  transition: color .15s, border-color .15s;
-  position: relative;
-}
-nav button:hover { color: var(--text); }
-nav button.active { color: var(--accent); border-bottom-color: var(--accent); }
-
-/* ─── MAIN ─── */
-main { padding: 20px; max-width: 1700px; margin: 0 auto; }
-.tab-content { display: none; animation: fadeIn .2s; }
-.tab-content.active { display: block; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
-
-/* ─── CARDS ─── */
-.card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 16px 18px;
-  margin-bottom: 16px;
-}
-.section-title {
-  font-family: 'Syne', sans-serif;
-  font-weight: 700;
-  font-size: 11px;
-  letter-spacing: 2.5px;
-  text-transform: uppercase;
-  color: var(--muted2);
-  margin-bottom: 14px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.section-title::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: var(--border);
-}
-
-/* ─── FORM ELEMENTS ─── */
-label {
-  display: block;
-  font-size: 10px;
-  font-weight: 600;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 4px;
-}
-input, select {
-  width: 100%;
-  background: var(--surface2);
-  border: 1px solid var(--border2);
-  border-radius: 5px;
-  color: var(--text);
-  font-family: 'DM Sans', sans-serif;
-  font-size: 13px;
-  padding: 7px 10px;
-  outline: none;
-  transition: border-color .15s, background .15s;
-}
-input:focus, select:focus { border-color: var(--accent); background: var(--surface3); }
-input[type=number] { font-family: 'Space Mono', monospace; font-size: 12px; }
-select option { background: var(--surface2); }
-
-/* ─── BUTTONS ─── */
-.btn {
-  display: inline-flex; align-items: center; gap: 5px;
-  padding: 7px 14px;
-  border-radius: 5px;
-  border: none;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: .5px;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: all .15s;
-  white-space: nowrap;
-}
-.btn-accent { background: var(--accent); color: #000; }
-.btn-accent:hover { background: #00ffb3; box-shadow: 0 0 16px rgba(0,240,160,.3); }
-.btn-blue { background: var(--blue-dim); color: var(--blue); border: 1px solid rgba(59,158,255,.25); }
-.btn-blue:hover { background: rgba(59,158,255,.2); }
-.btn-ghost { background: var(--surface2); color: var(--muted2); border: 1px solid var(--border2); }
-.btn-ghost:hover { color: var(--text); border-color: var(--muted); }
-.btn-danger { background: var(--danger-dim); color: var(--danger); border: 1px solid rgba(255,77,106,.2); }
-.btn-danger:hover { background: rgba(255,77,106,.22); }
-.btn-warn { background: var(--warn-dim); color: var(--warn); border: 1px solid rgba(255,181,71,.2); }
-.btn-sm { padding: 4px 9px; font-size: 10px; }
-
-/* ─── TABLES ─── */
-.tbl-wrap { overflow-x: auto; }
-table { width: 100%; border-collapse: collapse; }
-th {
-  background: var(--surface2);
-  color: var(--muted);
-  font-family: 'Space Mono', monospace;
-  font-size: 9px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  padding: 7px 10px;
-  text-align: left;
-  border-bottom: 1px solid var(--border2);
-  white-space: nowrap;
-}
-td {
-  padding: 7px 10px;
-  border-bottom: 1px solid rgba(30,39,54,.7);
-  font-family: 'Space Mono', monospace;
-  font-size: 11px;
-  vertical-align: middle;
-}
-tr:last-child td { border-bottom: none; }
-tr:hover td { background: rgba(255,255,255,.013); }
-.td-label { font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 12px; color: var(--text); }
-.td-price { color: var(--accent); }
-.td-income { color: var(--warn); font-weight: 700; }
-.td-neg { color: var(--danger); }
-.td-pos { color: var(--green); }
-.td-dim { color: var(--muted); }
-.td-blue { color: var(--blue); }
-
-/* ─── POS INPUTS ─── */
-.pi { width: 62px; padding: 4px 6px; text-align: right; font-size: 11px; }
-
-/* ─── STATS STRIP ─── */
-.stats-strip { display: flex; gap: 10px; flex-wrap: wrap; }
-.sstat {
-  background: var(--surface2);
-  border: 1px solid var(--border2);
-  border-radius: 7px;
-  padding: 11px 14px;
-  flex: 1;
-  min-width: 110px;
-}
-.sstat .lbl { font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 2px; }
-.sstat .val { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 22px; letter-spacing: -0.5px; }
-
-/* ─── CHIPS / BADGES ─── */
-.badge {
-  display: inline-block;
-  padding: 2px 7px;
-  border-radius: 3px;
-  font-family: 'Space Mono', monospace;
-  font-size: 9px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: .5px;
-}
-.b-am   { background: rgba(0,240,160,.15); color: var(--accent); }
-.b-pm   { background: rgba(59,158,255,.15); color: var(--blue); }
-.b-wd   { background: rgba(155,127,255,.15); color: var(--purple); }
-.b-in   { background: rgba(52,211,153,.15); color: var(--green); }
-.b-out  { background: rgba(255,77,106,.15); color: var(--danger); }
-.b-pend { background: rgba(255,181,71,.15); color: var(--warn); }
-.b-done { background: rgba(0,240,160,.15); color: var(--accent); }
-
-/* ─── MODAL ─── */
-.modal-bg {
-  display: none;
-  position: fixed; inset: 0;
-  background: rgba(0,0,0,.78);
-  z-index: 500;
-  align-items: center;
-  justify-content: center;
-  padding: 16px;
-}
-.modal-bg.open { display: flex; }
-.modal-box {
-  background: var(--surface);
-  border: 1px solid var(--border2);
-  border-radius: 10px;
-  padding: 22px;
-  max-width: 1000px;
-  width: 100%;
-  max-height: 90vh;
-  overflow-y: auto;
-}
-.modal-hd {
-  font-family: 'Syne', sans-serif;
-  font-weight: 800;
-  font-size: 17px;
-  letter-spacing: 1px;
-  color: var(--accent);
-  margin-bottom: 16px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.modal-close { background: none; border: none; color: var(--muted); font-size: 22px; cursor: pointer; line-height: 1; }
-.modal-close:hover { color: var(--text); }
-
-/* ─── LIVE BARS ─── */
-.lvbar-wrap { display: flex; align-items: center; gap: 6px; }
-.lvbar-track { flex: 1; height: 4px; background: var(--border2); border-radius: 2px; overflow: hidden; }
-.lvbar-fill { height: 100%; border-radius: 2px; background: var(--accent); }
-.lvbar-fill.mid { background: var(--warn); }
-.lvbar-fill.low { background: var(--danger); }
-
-/* ─── NOTE BOX ─── */
-.notebox {
-  font-size: 11px;
-  padding: 8px 12px;
-  border-radius: 5px;
-  margin-bottom: 12px;
-  display: none;
-  font-family: 'DM Sans', sans-serif;
-}
-.notebox.info  { background: var(--blue-dim); color: var(--blue); border: 1px solid rgba(59,158,255,.2); }
-.notebox.warn  { background: var(--warn-dim); color: var(--warn); border: 1px solid rgba(255,181,71,.2); }
-.notebox.ok    { background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(0,240,160,.2); }
-
-/* ─── DASHBOARD GRID ─── */
-.dash-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px,1fr)); gap: 10px; margin-bottom: 16px; }
-.dash-card { background: var(--surface2); border: 1px solid var(--border2); border-radius: 7px; padding: 12px 14px; }
-.dash-card .dlbl { font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 3px; }
-.dash-card .dval { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 20px; }
-
-/* ─── GCASH AREA ─── */
-.gcash-row { display: flex; gap: 6px; align-items: center; margin-bottom: 5px; }
-.gcash-row input { flex: 1; border-left: 3px solid var(--gcash); }
-
-/* ─── GRID HELPERS ─── */
-.row { display: flex; gap: 14px; flex-wrap: wrap; }
-.col { flex: 1; min-width: 150px; }
-hr.sep { border: none; border-top: 1px solid var(--border); margin: 14px 0; }
-
-/* ─── TOAST ─── */
-#toast {
-  position: fixed; bottom: 20px; right: 20px;
-  background: var(--surface);
-  border: 1px solid var(--accent);
-  border-radius: 6px;
-  padding: 9px 16px;
-  font-size: 12px; color: var(--accent);
-  font-family: 'DM Sans', sans-serif;
-  font-weight: 600;
-  opacity: 0; transform: translateY(8px);
-  transition: all .25s; z-index: 999; pointer-events: none;
-}
-#toast.show { opacity: 1; transform: translateY(0); }
-
-::-webkit-scrollbar { width: 4px; height: 4px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
-
-@media(max-width:680px){
-  header { padding: 0 10px; }
-  main { padding: 10px; }
-  nav button { font-size: 10px; padding: 0 9px; }
-  .logo { font-size: 14px; letter-spacing: 2px; margin-right: 10px; }
-}
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--bdr2);border-radius:2px;}
 </style>
 </head>
 <body>
 
+<!-- LOADING SCREEN -->
+<div id="loadScreen">
+  <div class="logo-big">TPP <em>INVENTORY</em></div>
+  <div class="spin"></div>
+  <div id="loadMsg">Connecting to database…</div>
+</div>
+
 <header>
-  <div class="logo">TPP <em>INVENTORY</em></div>
-  <nav id="navBar">
-    <button onclick="switchTab('daily')">Daily POS</button>
-    <button onclick="switchTab('saleslog')">Sales Log</button>
-    <button onclick="switchTab('stock')">Stock Room</button>
-    <button onclick="switchTab('live')">Live Inventory</button>
-    <button onclick="switchTab('loyalty')">Loyalty Cards</button>
-    <button onclick="switchTab('items')">Items</button>
-  </nav>
+  <div class="logo">TPP <em>INV</em></div>
+  <!-- Desktop nav -->
+  <div class="top-nav" id="topNav">
+    <button class="tnav-btn" onclick="switchTab('daily')">⚡ POS</button>
+    <button class="tnav-btn" onclick="switchTab('logs')">📋 Logs</button>
+    <button class="tnav-btn" onclick="switchTab('stock')">📦 Stock</button>
+    <button class="tnav-btn" onclick="switchTab('live')">🔴 Live</button>
+    <button class="tnav-btn" onclick="switchTab('loyalty')">🎴 Loyalty</button>
+    <button class="tnav-btn" onclick="switchTab('items')">🗂 Items</button>
+  </div>
+  <div class="hdr-right">
+    <div class="sync-dot" id="syncDot" title="Sync status"></div>
+    <div class="user-badge" id="userBadge" onclick="promptUser()">👤 Set Name</div>
+  </div>
 </header>
+
+<!-- Mobile bottom nav -->
+<div class="bottom-nav">
+  <div class="bottom-nav-inner">
+    <button class="bnav-btn" id="bn-daily" onclick="switchTab('daily')"><span class="ico">⚡</span>POS</button>
+    <button class="bnav-btn" id="bn-logs"  onclick="switchTab('logs')"><span class="ico">📋</span>Logs</button>
+    <button class="bnav-btn" id="bn-stock" onclick="switchTab('stock')"><span class="ico">📦</span>Stock</button>
+    <button class="bnav-btn" id="bn-live"  onclick="switchTab('live')"><span class="ico">🔴</span>Live</button>
+    <button class="bnav-btn" id="bn-items" onclick="switchTab('items')"><span class="ico">🗂</span>Items</button>
+  </div>
+</div>
 
 <main>
 
-<!-- ══════════════════════════════════════════════════
-     TAB 1 — DAILY POS (DAILY EDITOR)
-══════════════════════════════════════════════════ -->
+<!-- ══════════ TAB: DAILY POS ══════════ -->
 <div id="tab-daily" class="tab-content">
   <div class="card">
-    <div class="section-title">Shift Info</div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px 14px;align-items:end;margin-bottom:14px">
-      <div>
-        <label>Date</label>
-        <input type="date" id="posDate" onchange="posMetaChanged()">
-      </div>
-      <div>
-        <label>Shift</label>
+    <div class="sec">Shift Info</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:10px;align-items:end;margin-bottom:12px">
+      <div><label>Date</label><input type="date" id="posDate" onchange="posMetaChanged()"></div>
+      <div><label>Shift</label>
         <select id="posShift" onchange="posMetaChanged()">
           <option value="AM">AM</option>
           <option value="PM">PM</option>
           <option value="WD">Whole Day</option>
         </select>
       </div>
-      <div>
-        <label>Worker</label>
-        <input type="text" id="posWorker" placeholder="Name / Initials" style="text-transform:uppercase">
-      </div>
-      <div>
-        <label>Status</label>
+      <div><label>Worker</label><input type="text" id="posWorker" placeholder="Your name" style="text-transform:uppercase"></div>
+      <div><label>Status</label>
         <select id="posStatusSel">
           <option value="Pending">Pending</option>
-          <option value="Ready">Ready</option>
+          <option value="Ready">Ready ✓</option>
         </select>
       </div>
-      <div style="display:flex;gap:7px;align-self:flex-end">
-        <button class="btn btn-accent" onclick="saveShift()">💾 Save Shift</button>
-        <button class="btn btn-ghost" onclick="clearPOS()">↺</button>
-      </div>
     </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+      <button class="btn btn-acc" onclick="saveShift()" style="flex:1">💾 Save Shift</button>
+      <button class="btn btn-ghost" onclick="clearPOS()">↺ Clear</button>
+      <button class="btn btn-ghost btn-sm" onclick="loadShift()" title="Reload from server">⟳ Reload</button>
+    </div>
+    <div id="posNote" class="note info"></div>
 
-    <div id="posNote" class="notebox info"></div>
-
-    <div class="tbl-wrap">
+    <!-- DESKTOP: table -->
+    <div class="pos-desktop tbl-wrap">
       <table>
-        <thead>
-          <tr>
-            <th>Item</th>
-            <th>Price</th>
-            <th style="color:var(--blue)">Start</th>
-            <th style="color:var(--warn)">Sold</th>
-            <th style="color:var(--purple)">Comps</th>
-            <th style="color:var(--muted2)">End</th>
-            <th style="color:var(--green)">Refill</th>
-            <th style="color:var(--text)">Next</th>
-            <th style="color:var(--warn)">Income</th>
-          </tr>
-        </thead>
+        <thead><tr>
+          <th>Item</th><th>Price</th>
+          <th style="color:var(--blue)">Start</th>
+          <th style="color:var(--warn)">Sold</th>
+          <th style="color:var(--pur)">Comps</th>
+          <th style="color:var(--mut2)">End</th>
+          <th style="color:var(--grn)">Refill</th>
+          <th>Next</th>
+          <th style="color:var(--warn)">Income</th>
+        </tr></thead>
         <tbody id="posBody"></tbody>
         <tfoot id="posFoot"></tfoot>
       </table>
     </div>
 
-    <hr class="sep">
-    <div class="stats-strip">
-      <div class="sstat"><div class="lbl">Total Income</div><div class="val" id="chipTotal" style="color:var(--warn)">₱0</div></div>
-      <div class="sstat"><div class="lbl">GCash</div><div class="val" id="chipGcash" style="color:var(--gcash)">₱0</div></div>
-      <div class="sstat"><div class="lbl">Cash</div><div class="val" id="chipCash" style="color:var(--cash)">₱0</div></div>
-      <div class="sstat"><div class="lbl">Items Sold</div><div class="val" id="chipItems" style="color:var(--text)">0</div></div>
-    </div>
+    <!-- MOBILE: item cards -->
+    <div class="item-cards" id="posCards"></div>
 
-    <hr class="sep">
+    <hr>
+    <div class="stats">
+      <div class="stat"><div class="lbl">Total</div><div class="val" id="cTotal" style="color:var(--warn)">₱0</div></div>
+      <div class="stat"><div class="lbl">GCash</div><div class="val" id="cGcash" style="color:var(--blue)">₱0</div></div>
+      <div class="stat"><div class="lbl">Cash</div><div class="val" id="cCash"  style="color:var(--acc)">₱0</div></div>
+      <div class="stat"><div class="lbl">Sold</div><div class="val" id="cItems">0</div></div>
+    </div>
+    <hr>
     <div class="row" style="align-items:flex-start">
       <div class="col">
-        <div class="section-title">GCash Entries</div>
+        <div class="sec">GCash Entries</div>
         <div id="gcashList"></div>
         <button class="btn btn-ghost btn-sm" onclick="addGcash()" style="margin-top:8px">+ Add GCash Entry</button>
       </div>
-      <div style="min-width:140px">
-        <div class="section-title" style="margin-bottom:4px">GCash Total</div>
-        <div style="font-family:'Syne';font-weight:800;font-size:36px;color:var(--gcash)" id="gcashBig">₱0</div>
-        <div style="font-size:10px;color:var(--muted);margin-top:2px">Cash = Total − GCash</div>
+      <div style="min-width:130px">
+        <div class="lbl" style="margin-bottom:3px">GCash Total</div>
+        <div style="font-family:'Syne';font-weight:800;font-size:32px;color:var(--blue)" id="gcashBig">₱0</div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════════════
-     TAB 2 — SALES LOG (Q1 / Monthly Logs)
-══════════════════════════════════════════════════ -->
-<div id="tab-saleslog" class="tab-content">
+<!-- ══════════ TAB: LOGS ══════════ -->
+<div id="tab-logs" class="tab-content">
   <div class="card">
-    <div class="section-title">Yearly Overview</div>
-    <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-bottom:14px">
-      <div style="width:120px">
-        <label>Year</label>
-        <select id="logYear" onchange="onYearChange()"></select>
-      </div>
-      <div style="width:90px">
-        <label>Shift</label>
-        <select id="logShiftF" onchange="renderSalesLog()">
-          <option value="">All</option>
-          <option value="AM">AM</option>
-          <option value="PM">PM</option>
-          <option value="WD">WD</option>
+    <div class="sec">Year &amp; Month Filter</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:14px">
+      <div style="width:110px"><label>Year</label><select id="logYear" onchange="onYearChange()"></select></div>
+      <div style="width:90px"><label>Shift</label>
+        <select id="logShiftF" onchange="renderLogs()">
+          <option value="">All</option><option value="AM">AM</option>
+          <option value="PM">PM</option><option value="WD">WD</option>
         </select>
       </div>
-      <div style="width:170px">
-        <label>Worker / Date</label>
-        <input type="text" id="logSearch" placeholder="Search…" oninput="renderSalesLog()" style="font-size:12px">
+      <div style="flex:1;min-width:140px"><label>Worker / Date</label>
+        <input type="text" id="logSearch" placeholder="Search…" oninput="renderLogs()">
       </div>
-      <button class="btn btn-ghost btn-sm" onclick="clearAllLogs()" style="align-self:flex-end">🗑 Clear All</button>
+      <button class="btn btn-red btn-sm" onclick="clearAllLogs()" style="align-self:flex-end">🗑 Clear All</button>
     </div>
 
-    <!-- Yearly KPI strip -->
-    <div id="yearDash" style="margin-bottom:16px"></div>
-
-    <!-- Monthly breakdown grid for the year -->
-    <div class="section-title" style="margin-bottom:10px">Monthly Breakdown</div>
-    <div id="yearMonthGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px;margin-bottom:18px"></div>
-
-    <hr class="sep">
-
-    <!-- Month drill-down -->
-    <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-bottom:14px">
-      <div style="width:200px">
-        <label>Drill into Month</label>
-        <select id="logMonth" onchange="renderSalesLog()"></select>
-      </div>
+    <!-- Yearly KPIs -->
+    <div id="yearDash" class="stats" style="margin-bottom:14px"></div>
+    <!-- Monthly grid -->
+    <div class="mon-grid" id="yearGrid"></div>
+    <hr>
+    <!-- Drill-down month -->
+    <div style="width:210px;margin-bottom:14px">
+      <label>Selected Month</label>
+      <select id="logMonth" onchange="renderLogs()"></select>
     </div>
-
-    <!-- Monthly KPI chips -->
-    <div class="dash-grid" id="monthDash"></div>
-
-    <!-- Shift rows table -->
+    <div class="dash" id="monthDash"></div>
     <div class="tbl-wrap">
       <table>
-        <thead>
-          <tr>
-            <th>#</th><th>Date</th><th>Shift</th><th>Worker</th><th>Status</th>
-            <th>Items Sold</th>
-            <th style="color:var(--warn)">Total Income</th>
-            <th style="color:var(--gcash)">GCash</th>
-            <th style="color:var(--cash)">Cash</th>
-            <th></th>
-          </tr>
-        </thead>
+        <thead><tr>
+          <th>#</th><th>Date</th><th>Shift</th><th>Worker</th><th>Status</th>
+          <th>Sold</th><th style="color:var(--warn)">Income</th>
+          <th style="color:var(--blue)">GCash</th><th style="color:var(--acc)">Cash</th><th></th>
+        </tr></thead>
         <tbody id="logsBody"></tbody>
       </table>
     </div>
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════════════
-     TAB 3 — STOCK ROOM
-══════════════════════════════════════════════════ -->
+<!-- ══════════ TAB: STOCK ROOM ══════════ -->
 <div id="tab-stock" class="tab-content">
   <div class="card">
-    <div class="section-title">Record Movement</div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:10px;align-items:end">
+    <div class="sec">Record Movement</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;align-items:end">
       <div><label>Date</label><input type="date" id="stDate"></div>
       <div><label>Item</label><select id="stItem"></select></div>
       <div><label>Action</label>
         <select id="stAction">
-          <option value="IN">IN — Receiving stock</option>
-          <option value="OUT">OUT — Moving to floor</option>
+          <option value="IN">IN — Receiving</option>
+          <option value="OUT">OUT — To floor</option>
         </select>
       </div>
       <div><label>Qty</label><input type="number" id="stQty" min="1" value="1"></div>
       <div><label>Taken By</label><input type="text" id="stBy" placeholder="Worker" style="text-transform:uppercase"></div>
       <div style="display:flex;align-items:flex-end">
-        <button class="btn btn-accent" onclick="addStock()" style="width:100%">+ Record</button>
+        <button class="btn btn-acc btn-full" onclick="addStock()">+ Record</button>
       </div>
     </div>
   </div>
   <div class="card">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
-      <div class="section-title" style="margin:0">Transaction Log</div>
-      <input type="text" id="stSearch" placeholder="Search item, date…" style="width:170px;font-size:12px" oninput="renderStockTable()">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+      <div class="sec" style="margin:0">Transaction Log</div>
+      <input type="text" id="stSearch" placeholder="Search…" style="width:160px" oninput="renderStockTable()">
     </div>
     <div class="tbl-wrap">
       <table>
-        <thead><tr><th>#</th><th>Date</th><th>Item</th><th>Action</th><th>Qty</th><th>Remaining</th><th>Taken By</th><th></th></tr></thead>
+        <thead><tr><th>#</th><th>Date</th><th>Item</th><th>Action</th><th>Qty</th><th>Remaining</th><th>By</th><th></th></tr></thead>
         <tbody id="stBody"></tbody>
       </table>
     </div>
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════════════
-     TAB 4 — LIVE INVENTORY
-══════════════════════════════════════════════════ -->
+<!-- ══════════ TAB: LIVE INVENTORY ══════════ -->
 <div id="tab-live" class="tab-content">
   <div class="card">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px">
-      <div class="section-title" style="margin:0">Live Inventory Snapshot</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+      <div class="sec" style="margin:0">Live Inventory Snapshot</div>
       <div style="display:flex;gap:8px">
-        <input type="text" id="liveSearch" placeholder="Filter…" style="width:160px;font-size:12px" oninput="renderLive()">
-        <button class="btn btn-ghost btn-sm" onclick="renderLive()">↺ Refresh</button>
+        <input type="text" id="liveSearch" placeholder="Filter…" style="width:150px" oninput="renderLive()">
+        <button class="btn btn-ghost btn-sm" onclick="refreshAll().then(renderLive)">↺</button>
       </div>
     </div>
     <div class="tbl-wrap">
       <table>
-        <thead>
-          <tr>
-            <th>Item</th><th>Price</th>
-            <th style="color:var(--green)">Starting Stock</th>
-            <th style="color:var(--green)">Total IN</th>
-            <th style="color:var(--warn)">Total Sold</th>
-            <th style="color:var(--purple)">Total Comps</th>
-            <th style="color:var(--danger)">Total OUT</th>
-            <th>Remaining</th>
-            <th style="min-width:120px">Level</th>
-          </tr>
-        </thead>
+        <thead><tr>
+          <th>Item</th><th>Price</th>
+          <th style="color:var(--grn)">Start</th>
+          <th style="color:var(--grn)">IN</th>
+          <th style="color:var(--warn)">Sold</th>
+          <th style="color:var(--pur)">Comps</th>
+          <th style="color:var(--red)">OUT</th>
+          <th>Remaining</th>
+          <th style="min-width:100px">Level</th>
+        </tr></thead>
         <tbody id="liveBody"></tbody>
       </table>
     </div>
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════════════
-     TAB 5 — LOYALTY CARDS
-══════════════════════════════════════════════════ -->
+<!-- ══════════ TAB: LOYALTY ══════════ -->
 <div id="tab-loyalty" class="tab-content">
   <div class="card">
-    <div class="section-title">Add / Update Card</div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;align-items:end">
-      <div><label>Card #</label><input type="text" id="lcNum" placeholder="e.g. LC-001"></div>
+    <div class="sec">Add / Update Card</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;align-items:end">
+      <div><label>Card #</label><input type="text" id="lcNum" placeholder="LC-001"></div>
       <div><label>Customer Name</label><input type="text" id="lcName" placeholder="Full name"></div>
-      <div><label>Expiry Date</label><input type="date" id="lcExpiry"></div>
+      <div><label>Expiry</label><input type="date" id="lcExpiry"></div>
       <div><label>Stickers</label><input type="number" id="lcStickers" min="0" value="0"></div>
-      <div>
-        <label>Reward Status</label>
+      <div><label>Reward Status</label>
         <select id="lcReward">
           <option value="None">None</option>
           <option value="Pending Claim">Pending Claim</option>
@@ -593,14 +430,14 @@ hr.sep { border: none; border-top: 1px solid var(--border); margin: 14px 0; }
         </select>
       </div>
       <div style="display:flex;align-items:flex-end">
-        <button class="btn btn-accent" onclick="saveLoyalty()" style="width:100%">💾 Save Card</button>
+        <button class="btn btn-acc btn-full" onclick="saveLoyalty()">💾 Save</button>
       </div>
     </div>
   </div>
   <div class="card">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
-      <div class="section-title" style="margin:0">All Loyalty Cards</div>
-      <input type="text" id="lcSearch" placeholder="Search name, card #…" style="width:180px;font-size:12px" oninput="renderLoyalty()">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+      <div class="sec" style="margin:0">All Cards</div>
+      <input type="text" id="lcSearch" placeholder="Search…" style="width:160px" oninput="renderLoyalty()">
     </div>
     <div class="tbl-wrap">
       <table>
@@ -611,16 +448,14 @@ hr.sep { border: none; border-top: 1px solid var(--border); margin: 14px 0; }
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════════════
-     TAB 6 — ITEMS (Products / Prices)
-══════════════════════════════════════════════════ -->
+<!-- ══════════ TAB: ITEMS ══════════ -->
 <div id="tab-items" class="tab-content">
   <div class="card">
-    <div class="section-title">Add New Item</div>
-    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:18px">
+    <div class="sec">Add New Item</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:16px">
       <div class="col"><label>Item Name</label><input type="text" id="newName" placeholder="e.g. ENERGY DRINK" style="text-transform:uppercase"></div>
-      <div style="width:140px"><label>Price (₱)</label><input type="number" id="newPrice" min="0" placeholder="0.00"></div>
-      <div style="display:flex;align-items:flex-end"><button class="btn btn-accent" onclick="addItem()">+ Add Item</button></div>
+      <div style="width:130px"><label>Price (₱)</label><input type="number" id="newPrice" min="0" placeholder="0"></div>
+      <div style="display:flex;align-items:flex-end"><button class="btn btn-acc" onclick="addItem()">+ Add</button></div>
     </div>
     <div class="tbl-wrap">
       <table>
@@ -633,7 +468,7 @@ hr.sep { border: none; border-top: 1px solid var(--border); margin: 14px 0; }
 
 </main>
 
-<!-- ── SHIFT DETAIL MODAL ── -->
+<!-- SHIFT DETAIL MODAL -->
 <div class="modal-bg" id="shiftModal">
   <div class="modal-box">
     <div class="modal-hd">
@@ -647,80 +482,20 @@ hr.sep { border: none; border-top: 1px solid var(--border); margin: 14px 0; }
 <div id="toast"></div>
 
 <script>
-// ══════════════════════════════════════════════
-// DATABASE — IndexedDB
-// ══════════════════════════════════════════════
-const DB_NAME = 'TPP_DB_v2', DB_VER = 1;
-let db = null;
+// ══════════════════════════════════════════════════════
+//  ⚙️  CONFIGURATION — PASTE YOUR WEB APP URL BELOW
+// ══════════════════════════════════════════════════════
+const API_URL = 'PASTE_YOUR_WEB_APP_URL_HERE';
+// Example: 'https://script.google.com/macros/s/AKfycb.../exec'
 
-function openDB() {
-  return new Promise((res, rej) => {
-    const r = indexedDB.open(DB_NAME, DB_VER);
-    r.onupgradeneeded = e => {
-      const d = e.target.result;
-      // Products table (keyPath: name)
-      if (!d.objectStoreNames.contains('products'))
-        d.createObjectStore('products', { keyPath: 'name' });
-      // Sales log table (keyPath: id = date_shift)
-      if (!d.objectStoreNames.contains('saleslog'))
-        d.createObjectStore('saleslog', { keyPath: 'id' });
-      // Stock room transactions
-      if (!d.objectStoreNames.contains('stockmov'))
-        d.createObjectStore('stockmov', { keyPath: 'id' });
-      // Loyalty cards
-      if (!d.objectStoreNames.contains('loyalty'))
-        d.createObjectStore('loyalty', { keyPath: 'cardNum' });
-    };
-    r.onsuccess = e => { db = e.target.result; res(db); };
-    r.onerror   = e => rej(e.target.error);
-  });
-}
+// ══════════════════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════════════════
+let products=[], salesLog=[], stockMov=[], loyCards=[];
+let posRows=[], gcashEntries=[];
+let currentUser = localStorage.getItem('tpp_user')||'';
 
-function dbAll(store) {
-  return new Promise((res,rej) => {
-    const tx = db.transaction(store,'readonly');
-    const r  = tx.objectStore(store).getAll();
-    r.onsuccess = () => res(r.result||[]);
-    r.onerror   = () => rej(r.error);
-  });
-}
-function dbPut(store, obj) {
-  return new Promise((res,rej) => {
-    const tx = db.transaction(store,'readwrite');
-    const r  = tx.objectStore(store).put(obj);
-    r.onsuccess = () => res();
-    r.onerror   = () => rej(r.error);
-  });
-}
-function dbDel(store, key) {
-  return new Promise((res,rej) => {
-    const tx = db.transaction(store,'readwrite');
-    const r  = tx.objectStore(store).delete(key);
-    r.onsuccess = () => res();
-    r.onerror   = () => rej(r.error);
-  });
-}
-function dbClear(store) {
-  return new Promise((res,rej) => {
-    const tx = db.transaction(store,'readwrite');
-    const r  = tx.objectStore(store).clear();
-    r.onsuccess = () => res();
-    r.onerror   = () => rej(r.error);
-  });
-}
-
-// ══════════════════════════════════════════════
-// STATE
-// ══════════════════════════════════════════════
-let products  = [];  // [ {name, price} ]
-let salesLog  = [];  // [ shift records ]
-let stockMov  = [];  // [ stock movements ]
-let loyCards  = [];  // [ loyalty cards ]
-
-let posRows      = [];
-let gcashEntries = [];
-
-const DEFAULT_PRODUCTS = [
+const DEFAULT_PRODUCTS=[
   {name:'WATER 1L',price:30},{name:'POCARI (500ml)',price:55},{name:'Pocari 900ML',price:100},
   {name:'GATORADE',price:55},{name:'COKE',price:25},{name:'CHUCKIE',price:30},
   {name:'MR. CHIPS',price:30},{name:'S. CRUNCH (BIG)',price:30},{name:'S. CRUNCH (SMALL)',price:15},
@@ -735,791 +510,807 @@ const DEFAULT_PRODUCTS = [
   {name:'HOURLY',price:500},
 ];
 
-async function loadAll() {
-  [products, salesLog, stockMov, loyCards] = await Promise.all([
-    dbAll('products'), dbAll('saleslog'), dbAll('stockmov'), dbAll('loyalty')
-  ]);
-  if (!products.length) {
-    for (const p of DEFAULT_PRODUCTS) await dbPut('products', p);
-    products = [...DEFAULT_PRODUCTS];
+// ══════════════════════════════════════════════════════
+//  API — Google Apps Script
+// ══════════════════════════════════════════════════════
+function setSyncState(state){ // 'ok' | 'busy' | 'err'
+  const d=document.getElementById('syncDot');
+  d.className='sync-dot '+state;
+}
+
+async function apiGet(params){
+  setSyncState('busy');
+  try {
+    const url = API_URL+'?'+new URLSearchParams(params);
+    const r   = await fetch(url);
+    const d   = await r.json();
+    setSyncState('ok');
+    return d;
+  } catch(e) {
+    setSyncState('err');
+    throw e;
   }
-  sortSales();
 }
 
-function sortSales() {
-  const o = {AM:0,PM:1,WD:2};
-  salesLog.sort((a,b) => a.date!==b.date ? (a.date<b.date?-1:1) : (o[a.shift]??0)-(o[b.shift]??0));
+async function apiPost(body){
+  setSyncState('busy');
+  try {
+    const r = await fetch(API_URL, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(body)
+    });
+    const d = await r.json();
+    setSyncState('ok');
+    return d;
+  } catch(e){
+    setSyncState('err');
+    throw e;
+  }
 }
 
-// ══════════════════════════════════════════════
-// UTILS
-// ══════════════════════════════════════════════
-const fmt   = n => '₱'+Number(n||0).toLocaleString('en-PH',{minimumFractionDigits:0});
-const today = () => new Date().toISOString().slice(0,10);
+async function refreshAll(){
+  const d = await apiGet({action:'getAll'});
+  products = d.products||[];
+  if (!products.length) products=[...DEFAULT_PRODUCTS];
+  salesLog = (d.shifts||[]).sort((a,b)=>a.date!==b.date?(a.date<b.date?-1:1):{AM:0,PM:1,WD:2}[a.shift]-{AM:0,PM:1,WD:2}[b.shift]);
+  stockMov = d.stock||[];
+  loyCards = d.loyalty||[];
+}
 
-function toast(msg) {
+// ══════════════════════════════════════════════════════
+//  UTILS
+// ══════════════════════════════════════════════════════
+const fmt   = n=>'₱'+Number(n||0).toLocaleString('en-PH');
+const today = ()=>new Date().toISOString().slice(0,10);
+
+function toast(msg,type='acc'){
   const t=document.getElementById('toast');
-  t.textContent=msg; t.classList.add('show');
-  clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),2800);
+  t.textContent=msg;
+  t.style.color=type==='err'?'var(--red)':type==='warn'?'var(--warn)':'var(--acc)';
+  t.style.borderColor=type==='err'?'var(--red)':type==='warn'?'var(--warn)':'var(--acc)';
+  t.classList.add('show');
+  clearTimeout(t._t);
+  t._t=setTimeout(()=>t.classList.remove('show'),2800);
 }
 
-function showNote(msg, type='info') {
+function showNote(msg,type='info'){
   const n=document.getElementById('posNote');
-  n.textContent=msg; n.className='notebox '+type; n.style.display='block';
+  n.textContent=msg;n.className='note '+type;n.style.display='block';
 }
-function hideNote() { document.getElementById('posNote').style.display='none'; }
+function hideNote(){const n=document.getElementById('posNote');if(n)n.style.display='none';}
 
-// ══════════════════════════════════════════════
-// TAB SWITCHING
-// ══════════════════════════════════════════════
-const TABS = ['daily','saleslog','stock','live','loyalty','items'];
-function switchTab(name) {
-  document.querySelectorAll('.tab-content').forEach(e=>e.classList.remove('active'));
-  document.querySelectorAll('#navBar button').forEach(b=>b.classList.remove('active'));
-  document.getElementById('tab-'+name).classList.add('active');
-  document.querySelectorAll('#navBar button')[TABS.indexOf(name)].classList.add('active');
-  if (name==='saleslog') { populateYearFilter(); populateMonthFilter(); renderYearOverview(); renderSalesLog(); }
-  if (name==='stock')    { renderStockTable(); syncStockSelect(); }
-  if (name==='live')     renderLive();
-  if (name==='loyalty')  renderLoyalty();
-  if (name==='items')    renderItems();
+function promptUser(){
+  const n=prompt('Enter your name (this shows on saved shifts):',currentUser);
+  if(n!==null){
+    currentUser=n.toUpperCase().trim();
+    localStorage.setItem('tpp_user',currentUser);
+    document.getElementById('userBadge').textContent='👤 '+currentUser;
+    document.getElementById('posWorker').value=currentUser;
+  }
 }
 
-// ══════════════════════════════════════════════
-// ─── TAB 1: DAILY POS ───
-// ══════════════════════════════════════════════
-function initPOS() {
-  document.getElementById('posDate').value = today();
+// ══════════════════════════════════════════════════════
+//  TAB SWITCHING
+// ══════════════════════════════════════════════════════
+const TABS=['daily','logs','stock','live','loyalty','items'];
+
+function switchTab(name){
+  TABS.forEach(t=>{
+    document.getElementById('tab-'+t).classList.toggle('active',t===name);
+  });
+  // Top nav
+  document.querySelectorAll('.tnav-btn').forEach((b,i)=>{
+    b.classList.toggle('active',TABS[i]===name);
+  });
+  // Bottom nav
+  ['daily','logs','stock','live','items'].forEach(t=>{
+    const b=document.getElementById('bn-'+t);
+    if(b) b.classList.toggle('active',t===name);
+  });
+
+  if(name==='logs')   { refreshAll().then(()=>{ populateYearFilter(); renderYearOverview(); renderLogs(); }); }
+  if(name==='stock')  { refreshAll().then(()=>{ renderStockTable(); syncStockSelect(); }); }
+  if(name==='live')   { refreshAll().then(renderLive); }
+  if(name==='loyalty'){ refreshAll().then(renderLoyalty); }
+  if(name==='items')  { refreshAll().then(renderItems); }
+}
+
+// ══════════════════════════════════════════════════════
+//  DAILY POS
+// ══════════════════════════════════════════════════════
+function initPOS(){
+  document.getElementById('posDate').value=today();
+  if(currentUser) document.getElementById('posWorker').value=currentUser;
   posMetaChanged();
 }
 
-function posMetaChanged() {
-  const date  = document.getElementById('posDate').value;
-  const shift = document.getElementById('posShift').value;
-  if (!date) return;
+function posMetaChanged(){ loadShift(); }
 
-  // Check if this shift is already saved
-  const existing = salesLog.find(s=>s.date===date && s.shift===shift);
-  if (existing) {
-    // Load into editor
-    document.getElementById('posWorker').value    = existing.worker||'';
+async function loadShift(){
+  const date =document.getElementById('posDate').value;
+  const shift=document.getElementById('posShift').value;
+  if(!date) return;
+
+  // Refresh data from server first
+  try {
+    const d=await apiGet({action:'getAll'});
+    products=(d.products||[]);
+    if(!products.length) products=[...DEFAULT_PRODUCTS];
+    salesLog=(d.shifts||[]).sort((a,b)=>a.date!==b.date?(a.date<b.date?-1:1):{AM:0,PM:1,WD:2}[a.shift]-{AM:0,PM:1,WD:2}[b.shift]);
+    stockMov=d.stock||[];
+    loyCards=d.loyalty||[];
+  } catch(e){ toast('⚠ Could not reach server','err'); }
+
+  const existing=salesLog.find(s=>s.date===date&&s.shift===shift);
+  if(existing){
+    document.getElementById('posWorker').value    = existing.worker||currentUser||'';
     document.getElementById('posStatusSel').value = existing.status||'Pending';
-    posRows = products.map(p => {
-      const r = (existing.rows||[]).find(x=>x.name===p.name);
-      return r ? {...r} : {name:p.name, price:p.price, start:0, sold:0, comps:0, refill:0};
+    posRows=products.map(p=>{
+      const r=(existing.rows||[]).find(x=>x.name===p.name);
+      return r?{...r}:{name:p.name,price:p.price,start:0,sold:0,comps:0,refill:0};
     });
-    gcashEntries = [...(existing.gcashEntries||[])];
-    showNote(`📂 Loaded saved ${shift} shift for ${date}. Editing will overwrite when you save.`, 'warn');
+    gcashEntries=[...(existing.gcashEntries||[])];
+    showNote(`📂 Loaded ${shift} shift for ${date} — saved by ${existing.worker||'?'}. Editing will overwrite.`,'warn');
   } else {
-    // Fresh rows — auto-fill Start from previous shift
-    posRows = products.map(p => ({name:p.name,price:p.price,start:0,sold:0,comps:0,refill:0}));
-    gcashEntries = [];
-    const src = getPrevShiftSource(date, shift);
-    if (src) {
-      (src.rows||[]).forEach(sr => {
-        const row = posRows.find(r=>r.name===sr.name);
-        if (row) {
-          // Next = END + REFILL = (start-sold-comps) + refill
-          const end = (sr.start||0) - (sr.sold||0) - (sr.comps||0);
-          row.start = Math.max(0, end + (sr.refill||0));
+    posRows=products.map(p=>({name:p.name,price:p.price,start:0,sold:0,comps:0,refill:0}));
+    gcashEntries=[];
+    const src=getPrevSource(date,shift);
+    if(src){
+      (src.rows||[]).forEach(sr=>{
+        const row=posRows.find(r=>r.name===sr.name);
+        if(row){
+          const end=(sr.start||0)-(sr.sold||0)-(sr.comps||0);
+          row.start=Math.max(0,end+(sr.refill||0));
         }
       });
-      showNote(`✅ Start stock auto-filled from ${src.shift} on ${src.date} (${src.worker||'?'}).`, 'info');
+      showNote(`✅ Start auto-filled from ${src.shift} on ${src.date} (${src.worker||'?'}).`,'info');
     } else {
       hideNote();
     }
   }
-
   renderPOS();
   renderGcashUI();
 }
 
-// ─────────────────────────────────────────────
-// PREVIOUS SHIFT SOURCE LOGIC
-//
-//   AM  → last shift of the previous day
-//         (prefer PM → WD → AM of prev day; or go further back)
-//   PM  → AM of same day (if exists), else last shift of prev day
-//   WD  → PM of prev day → WD of prev day → AM of prev day → further back
-// ─────────────────────────────────────────────
-function getPrevShiftSource(date, shift) {
-  if (shift === 'PM') {
-    return salesLog.find(s=>s.date===date&&s.shift==='AM')
-        || getLastShiftBeforeDate(date);
+// Previous shift source logic
+function getPrevSource(date,shift){
+  if(shift==='PM'){
+    return salesLog.find(s=>s.date===date&&s.shift==='AM') || lastBefore(date);
   }
-  if (shift === 'WD') {
-    return getLatestShiftOnDate(getPrevDateWithData(date))
-        || getLastShiftBeforeDate(date);
+  if(shift==='WD'){
+    const pd=prevDate(date);
+    return (pd&&(salesLog.find(s=>s.date===pd&&s.shift==='PM')||
+                 salesLog.find(s=>s.date===pd&&s.shift==='WD')||
+                 salesLog.find(s=>s.date===pd&&s.shift==='AM'))) || lastBefore(date);
   }
-  // AM: last shift before this date
-  return getLastShiftBeforeDate(date);
+  return lastBefore(date);
 }
+function lastBefore(date){const b=salesLog.filter(s=>s.date<date);return b.length?b[b.length-1]:null;}
+function prevDate(date){const ds=[...new Set(salesLog.filter(s=>s.date<date).map(s=>s.date))].sort();return ds.length?ds[ds.length-1]:null;}
 
-function getLastShiftBeforeDate(date) {
-  const before = salesLog.filter(s=>s.date<date);
-  return before.length ? before[before.length-1] : null;
-}
+// Render POS table + mobile cards
+function renderPOS(){
+  const tbody=document.getElementById('posBody');
+  const cards=document.getElementById('posCards');
 
-function getPrevDateWithData(date) {
-  const dates = [...new Set(salesLog.filter(s=>s.date<date).map(s=>s.date))].sort();
-  return dates.length ? dates[dates.length-1] : null;
-}
-
-function getLatestShiftOnDate(date) {
-  if (!date) return null;
-  const onDate = salesLog.filter(s=>s.date===date);
-  return onDate.length ? onDate[onDate.length-1] : null;
-}
-
-// ─────────────────────────────────────────────
-// RENDER POS TABLE
-// ─────────────────────────────────────────────
-function renderPOS() {
-  const tbody = document.getElementById('posBody');
-  tbody.innerHTML = posRows.map((r,i) => {
-    const end    = (r.start||0) - (r.sold||0) - (r.comps||0);
-    const next   = end + (r.refill||0);
-    const income = (r.sold||0) * r.price;
-    return `<tr>
-      <td class="td-label">${r.name}</td>
-      <td class="td-price">${fmt(r.price)}</td>
+  let tableHTML='', cardsHTML='';
+  posRows.forEach((r,i)=>{
+    const end  =(r.start||0)-(r.sold||0)-(r.comps||0);
+    const next =end+(r.refill||0);
+    const inc  =(r.sold||0)*r.price;
+    // table row
+    tableHTML+=`<tr>
+      <td class="td-lbl">${r.name}</td>
+      <td class="td-acc">${fmt(r.price)}</td>
       <td><input type="number" class="pi" min="0" value="${r.start||0}"
            style="color:var(--blue)" oninput="posRows[${i}].start=+this.value||0;renderPOS()"></td>
       <td><input type="number" class="pi" min="0" value="${r.sold||0}"
            style="color:var(--warn)" oninput="posRows[${i}].sold=+this.value||0;renderPOS()"></td>
       <td><input type="number" class="pi" min="0" value="${r.comps||0}"
-           style="color:var(--purple)" oninput="posRows[${i}].comps=+this.value||0;renderPOS()"></td>
+           style="color:var(--pur)" oninput="posRows[${i}].comps=+this.value||0;renderPOS()"></td>
       <td class="${end<0?'td-neg':'td-dim'}">${end}</td>
       <td><input type="number" class="pi" min="0" value="${r.refill||0}"
-           style="color:var(--green)" oninput="posRows[${i}].refill=+this.value||0;renderPOS()"></td>
-      <td style="font-weight:700;color:${next<0?'var(--danger)':'var(--text)'}">${next}</td>
-      <td class="${income>0?'td-income':'td-dim'}">${fmt(income)}</td>
+           style="color:var(--grn)" oninput="posRows[${i}].refill=+this.value||0;renderPOS()"></td>
+      <td style="font-weight:700;color:${next<0?'var(--red)':'var(--txt)'}">${next}</td>
+      <td class="${inc>0?'td-warn':'td-dim'}">${fmt(inc)}</td>
     </tr>`;
-  }).join('');
+    // mobile card
+    cardsHTML+=`<div class="item-card">
+      <div class="item-card-name">${r.name} <span style="color:var(--acc);font-size:11px">${fmt(r.price)}</span></div>
+      <div class="item-card-grid">
+        <div class="icg-field"><label>Start</label>
+          <input type="number" class="pi" min="0" value="${r.start||0}"
+                 style="width:100%;color:var(--blue)" oninput="posRows[${i}].start=+this.value||0;renderPOS()">
+        </div>
+        <div class="icg-field"><label>Sold</label>
+          <input type="number" class="pi" min="0" value="${r.sold||0}"
+                 style="width:100%;color:var(--warn)" oninput="posRows[${i}].sold=+this.value||0;renderPOS()">
+        </div>
+        <div class="icg-field"><label>Comps</label>
+          <input type="number" class="pi" min="0" value="${r.comps||0}"
+                 style="width:100%;color:var(--pur)" oninput="posRows[${i}].comps=+this.value||0;renderPOS()">
+        </div>
+        <div class="icg-field"><label>Refill</label>
+          <input type="number" class="pi" min="0" value="${r.refill||0}"
+                 style="width:100%;color:var(--grn)" oninput="posRows[${i}].refill=+this.value||0;renderPOS()">
+        </div>
+        <div class="icg-field"><label>End</label>
+          <div class="icg-val ${end<0?'neg':'td-dim'}">${end}</div>
+        </div>
+        <div class="icg-field"><label>Next</label>
+          <div class="icg-val ${next<0?'neg':''}" style="${next>0?'color:var(--txt)':''}">${next}</div>
+        </div>
+      </div>
+      ${inc>0?`<div style="font-family:'DM Mono';font-size:11px;color:var(--warn);margin-top:6px;text-align:right">Income: ${fmt(inc)}</div>`:''}
+    </div>`;
+  });
 
-  const total = posRows.reduce((s,r)=>s+(r.sold||0)*r.price, 0);
-  const gcash = gcashEntries.reduce((s,v)=>s+(parseFloat(v)||0), 0);
-  const cash  = total - gcash;
-  const items = posRows.filter(r=>(r.sold||0)>0).length;
+  if(tbody) tbody.innerHTML=tableHTML;
+  if(cards) cards.innerHTML=cardsHTML;
 
-  document.getElementById('posFoot').innerHTML = `
-    <tr>
-      <td colspan="8" style="text-align:right;font-family:'DM Sans';font-size:10px;
-          color:var(--muted);letter-spacing:1px;text-transform:uppercase;padding:10px">
-        TOTAL SHIFT INCOME
-      </td>
-      <td style="font-family:'Syne';font-weight:800;font-size:20px;color:var(--warn);padding:10px">${fmt(total)}</td>
-    </tr>`;
-  document.getElementById('chipTotal').textContent = fmt(total);
-  document.getElementById('chipGcash').textContent = fmt(gcash);
-  document.getElementById('chipCash').textContent  = fmt(cash);
-  document.getElementById('chipItems').textContent = items;
-  document.getElementById('gcashBig').textContent  = fmt(gcash);
+  const total=posRows.reduce((s,r)=>s+(r.sold||0)*r.price,0);
+  const gc   =gcashEntries.reduce((s,v)=>s+(parseFloat(v)||0),0);
+  const cash =total-gc;
+  const sold =posRows.filter(r=>(r.sold||0)>0).length;
+
+  document.getElementById('posFoot').innerHTML=`<tr>
+    <td colspan="8" style="text-align:right;font-size:10px;color:var(--mut);font-family:'DM Sans';letter-spacing:1px;text-transform:uppercase;padding:9px">Total Income</td>
+    <td style="font-family:'Syne';font-weight:800;font-size:19px;color:var(--warn);padding:9px">${fmt(total)}</td>
+  </tr>`;
+  document.getElementById('cTotal').textContent=fmt(total);
+  document.getElementById('cGcash').textContent=fmt(gc);
+  document.getElementById('cCash').textContent =fmt(cash);
+  document.getElementById('cItems').textContent=sold;
+  document.getElementById('gcashBig').textContent=fmt(gc);
 }
 
-function clearPOS() {
+function clearPOS(){
   posRows.forEach(r=>{r.start=0;r.sold=0;r.comps=0;r.refill=0;});
   gcashEntries=[];
-  renderPOS(); renderGcashUI(); hideNote();
+  renderPOS();renderGcashUI();hideNote();
 }
 
-async function saveShift() {
-  const date   = document.getElementById('posDate').value;
-  const shift  = document.getElementById('posShift').value;
-  const worker = (document.getElementById('posWorker').value||'').toUpperCase().trim()||'—';
-  const status = document.getElementById('posStatusSel').value;
-  if (!date) { toast('⚠ Pick a date'); return; }
+async function saveShift(){
+  const date  =document.getElementById('posDate').value;
+  const shift =document.getElementById('posShift').value;
+  const worker=(document.getElementById('posWorker').value||currentUser||'').toUpperCase().trim()||'—';
+  const status=document.getElementById('posStatusSel').value;
+  if(!date){toast('⚠ Pick a date','warn');return;}
 
-  const total = posRows.reduce((s,r)=>s+(r.sold||0)*r.price,0);
-  const gcash = gcashEntries.reduce((s,v)=>s+(parseFloat(v)||0),0);
-  const itemsSold = posRows.filter(r=>(r.sold||0)>0).length;
+  const total=posRows.reduce((s,r)=>s+(r.sold||0)*r.price,0);
+  const gc   =gcashEntries.reduce((s,v)=>s+(parseFloat(v)||0),0);
+  const sold =posRows.filter(r=>(r.sold||0)>0).length;
 
-  const record = {
-    id: `${date}_${shift}`,
-    date, shift, worker, status,
-    totalIncome: total,
-    gcash, cash: total-gcash,
-    itemsSold,
-    rows: posRows.map(r=>({...r})),
-    gcashEntries: [...gcashEntries],
-    savedAt: Date.now()
+  const record={
+    id:`${date}_${shift}`,date,shift,worker,status,
+    totalIncome:total,gcash:gc,cash:total-gc,itemsSold:sold,
+    rows:posRows.map(r=>({...r})),
+    gcashEntries:[...gcashEntries],
+    savedAt:Date.now()
   };
 
-  // AUTO SYNC: For every item with a refill > 0, create an OUT in stock room
-  for (const r of posRows) {
-    if ((r.refill||0) > 0) {
-      // Only auto-log if this shift is being submitted as Ready
-      if (status === 'Ready') {
-        const autoId = `auto_${date}_${shift}_${r.name.replace(/\s+/g,'_')}`;
-        const exists = stockMov.find(e=>e.id===autoId);
-        if (!exists) {
-          const prev = stockMov.filter(e=>e.item===r.name);
-          const prevBal = prev.length ? prev[prev.length-1].remaining : 0;
-          const entry = {
-            id: autoId, date, item: r.name,
-            action: 'OUT', qty: r.refill,
-            remaining: prevBal - r.refill,
-            takenBy: worker, note: `Auto — Refill from ${shift} shift`
-          };
-          stockMov.push(entry);
-          await dbPut('stockmov', entry);
-        }
-      }
-    }
+  try {
+    await apiPost({action:'saveShift',data:record});
+    // Update local
+    const idx=salesLog.findIndex(s=>s.id===record.id);
+    if(idx>=0) salesLog[idx]=record; else salesLog.push(record);
+    salesLog.sort((a,b)=>a.date!==b.date?(a.date<b.date?-1:1):{AM:0,PM:1,WD:2}[a.shift]-{AM:0,PM:1,WD:2}[b.shift]);
+    showNote(`✅ ${shift} shift for ${date} saved by ${worker}.`,'ok');
+    toast('✅ Shift saved!');
+  } catch(e){
+    toast('⚠ Save failed — check connection','err');
   }
-
-  const idx = salesLog.findIndex(s=>s.id===record.id);
-  if (idx>=0) salesLog[idx]=record; else salesLog.push(record);
-  sortSales();
-  await dbPut('saleslog', record);
-  showNote(`✅ ${shift} shift for ${date} saved.`, 'ok');
-  toast('✅ Shift saved!');
 }
 
-// ─── GCASH ───
-function renderGcashUI() {
-  document.getElementById('gcashList').innerHTML = gcashEntries.map((v,i)=>`
-    <div class="gcash-row">
+// GCASH
+function renderGcashUI(){
+  document.getElementById('gcashList').innerHTML=gcashEntries.map((v,i)=>`
+    <div class="gc-row">
       <input type="number" value="${v||''}" placeholder="Amount"
              oninput="gcashEntries[${i}]=parseFloat(this.value)||0;renderPOS()">
-      <button class="btn btn-danger btn-sm" onclick="gcashEntries.splice(${i},1);renderGcashUI();renderPOS()">×</button>
+      <button class="btn btn-red btn-sm" onclick="gcashEntries.splice(${i},1);renderGcashUI();renderPOS()">×</button>
     </div>`).join('');
 }
-function addGcash() { gcashEntries.push(0); renderGcashUI(); }
+function addGcash(){gcashEntries.push(0);renderGcashUI();}
 
-// ══════════════════════════════════════════════
-// ─── TAB 2: SALES LOG ───
-// ══════════════════════════════════════════════
-// ── YEAR FILTER ──
-function populateYearFilter() {
-  const sel  = document.getElementById('logYear');
-  const curY = new Date().getFullYear();
-  // Collect years from data + always show current year + 2 prior years
-  const dataYears = new Set(salesLog.map(s=>parseInt(s.date.slice(0,4))));
-  for (let y = curY-2; y <= curY+1; y++) dataYears.add(y);
-  const sorted = [...dataYears].sort().reverse();
-  const prev   = sel.value ? parseInt(sel.value) : curY;
-  sel.innerHTML = sorted.map(y =>
-    `<option value="${y}" ${y===prev?'selected':''}>${y}</option>`
-  ).join('');
+// ══════════════════════════════════════════════════════
+//  LOGS TAB
+// ══════════════════════════════════════════════════════
+function populateYearFilter(){
+  const sel=document.getElementById('logYear');
+  const curY=new Date().getFullYear();
+  const yrs=new Set(salesLog.map(s=>parseInt(s.date.slice(0,4))));
+  for(let y=curY-2;y<=curY+1;y++) yrs.add(y);
+  const sorted=[...yrs].sort().reverse();
+  const prev=sel.value?parseInt(sel.value):curY;
+  sel.innerHTML=sorted.map(y=>`<option value="${y}" ${y===prev?'selected':''}>${y}</option>`).join('');
 }
 
-function populateMonthFilter() {
-  const year = parseInt(document.getElementById('logYear')?.value) || new Date().getFullYear();
-  const sel  = document.getElementById('logMonth');
-  const prev = sel.value;
-  // Always show all 12 months for the selected year
-  const months = [];
-  for (let m=1; m<=12; m++) {
-    const val = `${year}-${String(m).padStart(2,'0')}`;
-    months.push(val);
+function populateMonthFilter(){
+  const year=parseInt(document.getElementById('logYear')?.value)||new Date().getFullYear();
+  const sel=document.getElementById('logMonth');
+  const prev=sel.value;
+  const curM=today().slice(0,7);
+  const opts=[];
+  for(let m=12;m>=1;m--){
+    const val=`${year}-${String(m).padStart(2,'0')}`;
+    const [y,mo]=val.split('-');
+    const lbl=new Date(y,mo-1).toLocaleString('default',{month:'long',year:'numeric'});
+    const has=salesLog.some(s=>s.date.startsWith(val));
+    opts.push(`<option value="${val}" ${val===(prev||curM)?'selected':''}>${lbl}${has?' ●':''}</option>`);
   }
-  // Current month as default
-  const curMonth = today().slice(0,7);
-  const defaultM = months.includes(curMonth) ? curMonth : months[months.length-1];
-  sel.innerHTML = months.reverse().map(m => {
-    const [y,mo] = m.split('-');
-    const lbl = new Date(y,mo-1).toLocaleString('default',{month:'long',year:'numeric'});
-    const hasData = salesLog.some(s=>s.date.startsWith(m));
-    return `<option value="${m}" ${m===(prev||defaultM)?'selected':''}>${lbl}${hasData?' ●':''}</option>`;
-  }).join('');
+  sel.innerHTML=opts.join('');
 }
 
-function onYearChange() {
+function onYearChange(){
   populateMonthFilter();
   renderYearOverview();
-  renderSalesLog();
+  renderLogs();
 }
 
-// ── YEARLY OVERVIEW ──
-function renderYearOverview() {
-  const year = parseInt(document.getElementById('logYear')?.value) || new Date().getFullYear();
-  const yearStr = String(year);
-  const yearData = salesLog.filter(s=>s.date.startsWith(yearStr));
+function renderYearOverview(){
+  const year=String(parseInt(document.getElementById('logYear')?.value)||new Date().getFullYear());
+  const yd=salesLog.filter(s=>s.date.startsWith(year));
+  const yT=yd.reduce((s,sh)=>s+(sh.totalIncome||0),0);
+  const yG=yd.reduce((s,sh)=>s+(sh.gcash||0),0);
+  const yC=yd.reduce((s,sh)=>s+(sh.cash||0),0);
+  const yS=yd.length;
+  const yD=new Set(yd.map(s=>s.date)).size;
+  const yA=yS?Math.round(yT/yS):0;
 
-  const yTotal  = yearData.reduce((s,sh)=>s+(sh.totalIncome||0),0);
-  const yGcash  = yearData.reduce((s,sh)=>s+(sh.gcash||0),0);
-  const yCash   = yearData.reduce((s,sh)=>s+(sh.cash||0),0);
-  const yShifts = yearData.length;
-  const yDays   = new Set(yearData.map(s=>s.date)).size;
-  const yAvg    = yShifts ? Math.round(yTotal/yShifts) : 0;
-  const yItems  = yearData.reduce((s,sh)=>s+(sh.itemsSold||0),0);
-  const bestM   = getBestMonth(yearStr);
+  // Best month
+  let bm='—',bv=0;
+  for(let m=1;m<=12;m++){
+    const mk=`${year}-${String(m).padStart(2,'0')}`;
+    const mv=salesLog.filter(s=>s.date.startsWith(mk)).reduce((s,sh)=>s+(sh.totalIncome||0),0);
+    if(mv>bv){bv=mv;bm=new Date(year,m-1).toLocaleString('default',{month:'short'})+' '+fmt(mv);}
+  }
 
-  document.getElementById('yearDash').innerHTML = `
-    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:6px">
-      ${[
-        {l:`${year} Total Revenue`, v:fmt(yTotal),  c:'var(--warn)'},
-        {l:'GCash',                 v:fmt(yGcash),  c:'var(--gcash)'},
-        {l:'Cash',                  v:fmt(yCash),   c:'var(--cash)'},
-        {l:'Avg / Shift',           v:fmt(yAvg),    c:'var(--blue)'},
-        {l:'Total Shifts',          v:yShifts,      c:'var(--text)'},
-        {l:'Days Operated',         v:yDays,        c:'var(--text)'},
-        {l:'Items Sold',            v:yItems,       c:'var(--purple)'},
-        {l:'Best Month',            v:bestM.label,  c:'var(--accent)'},
-      ].map(x=>`<div class="sstat" style="min-width:120px">
-        <div class="lbl">${x.l}</div>
-        <div class="val" style="color:${x.c};font-size:${x.l.length>10?'17px':'22px'}">${x.v}</div>
-      </div>`).join('')}
-    </div>`;
+  document.getElementById('yearDash').innerHTML=[
+    {l:`${year} Revenue`,v:fmt(yT),c:'var(--warn)'},
+    {l:'GCash',v:fmt(yG),c:'var(--blue)'},
+    {l:'Cash',v:fmt(yC),c:'var(--acc)'},
+    {l:'Avg/Shift',v:fmt(yA),c:'var(--blue)'},
+    {l:'Shifts',v:yS,c:'var(--txt)'},
+    {l:'Days',v:yD,c:'var(--txt)'},
+    {l:'Best Month',v:bm,c:'var(--pur)'},
+  ].map(x=>`<div class="stat"><div class="lbl">${x.l}</div><div class="val" style="color:${x.c};font-size:16px">${x.v}</div></div>`).join('');
 
-  // Monthly grid — 12 cards
-  const MONTH_NAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  document.getElementById('yearMonthGrid').innerHTML = MONTH_NAMES.map((mn,mi) => {
-    const mKey  = `${year}-${String(mi+1).padStart(2,'0')}`;
-    const mData = salesLog.filter(s=>s.date.startsWith(mKey));
-    const mTot  = mData.reduce((s,sh)=>s+(sh.totalIncome||0),0);
-    const mGc   = mData.reduce((s,sh)=>s+(sh.gcash||0),0);
-    const mCsh  = mData.reduce((s,sh)=>s+(sh.cash||0),0);
-    const mSh   = mData.length;
-    const isCur = mKey === today().slice(0,7);
-    const isEmpty = !mData.length;
-    return `<div onclick="drillMonth('${mKey}')" style="
-        background:var(--surface2);
-        border:1px solid ${isCur?'var(--accent)':isEmpty?'var(--border)':'var(--border2)'};
-        border-radius:7px;padding:11px 13px;cursor:pointer;
-        opacity:${isEmpty?'.45':'1'};
-        transition:border-color .15s,opacity .15s;
-      " onmouseover="this.style.borderColor='var(--accent)'"
-         onmouseout="this.style.borderColor='${isCur?'var(--accent)':isEmpty?'var(--border)':'var(--border2)'}'">
-      <div style="font-family:'Space Mono';font-size:10px;color:var(--muted);margin-bottom:4px;letter-spacing:1px">
-        ${mn} ${year}${isCur?' ◉':''}
+  const MN=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const selM=document.getElementById('logMonth')?.value||'';
+  document.getElementById('yearGrid').innerHTML=MN.map((mn,mi)=>{
+    const mk=`${year}-${String(mi+1).padStart(2,'0')}`;
+    const md=salesLog.filter(s=>s.date.startsWith(mk));
+    const mt=md.reduce((s,sh)=>s+(sh.totalIncome||0),0);
+    const mg=md.reduce((s,sh)=>s+(sh.gcash||0),0);
+    const mc=md.reduce((s,sh)=>s+(sh.cash||0),0);
+    const ms=md.length;
+    const isCur=mk===today().slice(0,7);
+    const isSel=mk===selM;
+    const empty=!md.length;
+    return `<div class="mon-card ${empty?'empty':''} ${isSel?'active':''}"
+         onclick="drillMonth('${mk}')"
+         style="${isCur?'border-color:var(--acc)!important':''}">
+      <div class="mon-lbl">${mn} ${year}${isCur?' ◉':''}</div>
+      <div class="mon-val" style="color:${empty?'var(--mut)':'var(--warn)'}">${empty?'—':fmt(mt)}</div>
+      ${!empty?`<div style="font-size:9px;color:var(--mut);margin-top:3px;font-family:'DM Mono'">
+        <span style="color:var(--blue)">G:${fmt(mg)}</span>
+        <span style="margin-left:5px;color:var(--acc)">C:${fmt(mc)}</span>
       </div>
-      <div style="font-family:'Syne';font-weight:800;font-size:16px;color:${isEmpty?'var(--muted)':'var(--warn)'}">
-        ${isEmpty ? '—' : fmt(mTot)}
-      </div>
-      ${!isEmpty ? `
-        <div style="font-size:9px;color:var(--muted);margin-top:3px;font-family:'Space Mono'">
-          <span style="color:var(--gcash)">G:${fmt(mGc)}</span>
-          <span style="margin-left:4px;color:var(--cash)">C:${fmt(mCsh)}</span>
-        </div>
-        <div style="font-size:9px;color:var(--muted);margin-top:1px">${mSh} shift${mSh!==1?'s':''}</div>
-      ` : ''}
+      <div style="font-size:9px;color:var(--mut)">${ms} shift${ms!==1?'s':''}</div>`:''}
     </div>`;
   }).join('');
 }
 
-function getBestMonth(yearStr) {
-  let best = null, bestVal = 0;
-  for (let m=1; m<=12; m++) {
-    const mKey  = `${yearStr}-${String(m).padStart(2,'0')}`;
-    const mTot  = salesLog.filter(s=>s.date.startsWith(mKey)).reduce((s,sh)=>s+(sh.totalIncome||0),0);
-    if (mTot > bestVal) { bestVal=mTot; best=mKey; }
-  }
-  if (!best) return {label:'—'};
-  const [y,mo] = best.split('-');
-  return { label: new Date(y,mo-1).toLocaleString('default',{month:'short'})+' '+fmt(bestVal) };
+function drillMonth(mk){
+  document.getElementById('logMonth').value=mk;
+  renderLogs();
+  // Re-render grid to update active state
+  renderYearOverview();
+  document.getElementById('monthDash').scrollIntoView({behavior:'smooth',block:'start'});
 }
 
-function drillMonth(mKey) {
-  // Set the month dropdown and re-render
-  document.getElementById('logMonth').value = mKey;
-  renderSalesLog();
-  // Scroll to the table
-  document.getElementById('monthDash').scrollIntoView({behavior:'smooth', block:'start'});
-}
+function renderLogs(){
+  const month=document.getElementById('logMonth')?.value||today().slice(0,7);
+  const sf   =document.getElementById('logShiftF')?.value||'';
+  const q    =(document.getElementById('logSearch')?.value||'').toLowerCase();
+  let list=salesLog.filter(s=>s.date.startsWith(month));
+  if(sf) list=list.filter(s=>s.shift===sf);
+  if(q)  list=list.filter(s=>s.date.includes(q)||s.worker.toLowerCase().includes(q));
 
-function renderSalesLog() {
-  const month = document.getElementById('logMonth')?.value||today().slice(0,7);
-  const sf    = document.getElementById('logShiftF')?.value||'';
-  const q     = (document.getElementById('logSearch')?.value||'').toLowerCase();
+  const mT=list.reduce((s,sh)=>s+(sh.totalIncome||0),0);
+  const mG=list.reduce((s,sh)=>s+(sh.gcash||0),0);
+  const mC=list.reduce((s,sh)=>s+(sh.cash||0),0);
+  const mS=list.length;
+  const mD=new Set(list.map(s=>s.date)).size;
+  const [y,mo]=month.split('-');
+  const mLbl=new Date(y,mo-1).toLocaleString('default',{month:'long',year:'numeric'});
 
-  let list = salesLog.filter(s=>s.date.startsWith(month));
-  if (sf) list=list.filter(s=>s.shift===sf);
-  if (q)  list=list.filter(s=>s.date.includes(q)||s.worker.toLowerCase().includes(q));
+  document.getElementById('monthDash').innerHTML=[
+    {l:'Month',v:mLbl,c:'var(--txt)',fs:'13px'},
+    {l:'Revenue',v:fmt(mT),c:'var(--warn)'},
+    {l:'GCash',v:fmt(mG),c:'var(--blue)'},
+    {l:'Cash',v:fmt(mC),c:'var(--acc)'},
+    {l:'Avg/Shift',v:fmt(mS?Math.round(mT/mS):0),c:'var(--blue)'},
+    {l:'Shifts',v:mS,c:'var(--txt)'},
+    {l:'Days',v:mD,c:'var(--txt)'},
+  ].map(x=>`<div class="dchip"><div class="lbl">${x.l}</div>
+    <div class="val" style="color:${x.c};${x.fs?'font-size:'+x.fs:'font-size:18px'}">${x.v}</div></div>`).join('');
 
-  // KPI dashboard
-  const mTotal  = list.reduce((s,sh)=>s+(sh.totalIncome||0),0);
-  const mGcash  = list.reduce((s,sh)=>s+(sh.gcash||0),0);
-  const mCash   = list.reduce((s,sh)=>s+(sh.cash||0),0);
-  const mShifts = list.length;
-  const mDays   = new Set(list.map(s=>s.date)).size;
-  const mAvg    = mShifts ? Math.round(mTotal/mShifts) : 0;
-  const mItems  = list.reduce((s,sh)=>s+(sh.itemsSold||0),0);
-  const [y,mo]  = month.split('-');
-  const mLabel  = new Date(y,mo-1).toLocaleString('default',{month:'long',year:'numeric'});
-
-  document.getElementById('monthDash').innerHTML = [
-    {l:'Month',v:mLabel,c:'var(--text)',fs:'14px'},
-    {l:'Total Revenue',v:fmt(mTotal),c:'var(--warn)'},
-    {l:'GCash',v:fmt(mGcash),c:'var(--gcash)'},
-    {l:'Cash',v:fmt(mCash),c:'var(--cash)'},
-    {l:'Avg / Shift',v:fmt(mAvg),c:'var(--blue)'},
-    {l:'Shifts Logged',v:mShifts,c:'var(--text)'},
-    {l:'Days Active',v:mDays,c:'var(--text)'},
-    {l:'Items Sold',v:mItems,c:'var(--purple)'},
-  ].map(x=>`<div class="dash-card">
-    <div class="dlbl">${x.l}</div>
-    <div class="dval" style="color:${x.c};${x.fs?'font-size:'+x.fs:''}">
-      ${x.v}
-    </div>
-  </div>`).join('');
-
-  const display = [...list].reverse();
-  const tbody   = document.getElementById('logsBody');
-  if (!display.length) {
-    tbody.innerHTML=`<tr><td colspan="10" style="text-align:center;color:var(--muted);padding:28px;font-family:'DM Sans'">No shifts for ${mLabel}.</td></tr>`;
+  const disp=[...list].reverse();
+  const tb=document.getElementById('logsBody');
+  if(!disp.length){
+    tb.innerHTML=`<tr><td colspan="10" style="text-align:center;color:var(--mut);padding:28px;font-family:'DM Sans'">No shifts for ${mLbl}.</td></tr>`;
     return;
   }
-  tbody.innerHTML = display.map((s,i)=>`
-    <tr>
-      <td class="td-dim">${display.length-i}</td>
-      <td>${s.date}</td>
-      <td><span class="badge b-${s.shift.toLowerCase()}">${s.shift}</span></td>
-      <td class="td-label">${s.worker}</td>
-      <td><span class="badge ${s.status==='Ready'?'b-done':'b-pend'}">${s.status||'Pending'}</span></td>
-      <td>${s.itemsSold||0}</td>
-      <td class="td-income">${fmt(s.totalIncome)}</td>
-      <td class="td-blue">${fmt(s.gcash)}</td>
-      <td style="color:var(--cash)">${fmt(s.cash)}</td>
-      <td style="display:flex;gap:4px;flex-wrap:nowrap">
-        <button class="btn btn-ghost btn-sm" onclick='viewShift("${s.id}")'>👁</button>
-        <button class="btn btn-blue btn-sm" onclick='loadEditShift("${s.id}")'>✏️</button>
-        <button class="btn btn-danger btn-sm" onclick='delShift("${s.id}")'>×</button>
-      </td>
-    </tr>`).join('');
+  tb.innerHTML=disp.map((s,i)=>`<tr>
+    <td class="td-dim">${disp.length-i}</td>
+    <td>${s.date}</td>
+    <td><span class="bdg b-${s.shift.toLowerCase()}">${s.shift}</span></td>
+    <td class="td-lbl">${s.worker}</td>
+    <td><span class="bdg ${s.status==='Ready'?'b-done':'b-pend'}">${s.status||'Pending'}</span></td>
+    <td>${s.itemsSold||0}</td>
+    <td class="td-warn">${fmt(s.totalIncome)}</td>
+    <td class="td-blue">${fmt(s.gcash)}</td>
+    <td style="color:var(--acc)">${fmt(s.cash)}</td>
+    <td style="display:flex;gap:4px;flex-wrap:nowrap">
+      <button class="btn btn-ghost btn-sm" onclick='viewShift("${s.id}")'>👁</button>
+      <button class="btn btn-blue btn-sm" onclick='editShift("${s.id}")'>✏️</button>
+      <button class="btn btn-red btn-sm" onclick='delShift("${s.id}")'>×</button>
+    </td>
+  </tr>`).join('');
 }
 
-function viewShift(id) {
-  const s = salesLog.find(x=>x.id===id);
-  if (!s) return;
-  document.getElementById('modalTitle').textContent = `${s.shift} SHIFT — ${s.date} — ${s.worker}`;
-
-  const rows = (s.rows||[]).filter(r=>(r.start||r.sold||r.comps||r.refill));
-  const rowsHtml = rows.length ? rows.map(r=>{
-    const end  = (r.start||0)-(r.sold||0)-(r.comps||0);
-    const next = end+(r.refill||0);
-    const inc  = (r.sold||0)*r.price;
+function viewShift(id){
+  const s=salesLog.find(x=>x.id===id);if(!s)return;
+  document.getElementById('modalTitle').textContent=`${s.shift} — ${s.date} — ${s.worker}`;
+  const rows=(s.rows||[]).filter(r=>r.start||r.sold||r.comps||r.refill);
+  const rHtml=rows.length?rows.map(r=>{
+    const end=(r.start||0)-(r.sold||0)-(r.comps||0);
+    const next=end+(r.refill||0);
+    const inc=(r.sold||0)*r.price;
     return `<tr>
-      <td class="td-label">${r.name}</td>
-      <td class="td-price">${fmt(r.price)}</td>
+      <td class="td-lbl">${r.name}</td><td class="td-acc">${fmt(r.price)}</td>
       <td style="color:var(--blue)">${r.start||0}</td>
       <td style="color:var(--warn)">${r.sold||0}</td>
-      <td style="color:var(--purple)">${r.comps||0}</td>
+      <td style="color:var(--pur)">${r.comps||0}</td>
       <td class="${end<0?'td-neg':'td-dim'}">${end}</td>
-      <td style="color:var(--green)">${r.refill||0}</td>
-      <td style="font-weight:700;color:${next<0?'var(--danger)':'var(--text)'}">${next}</td>
-      <td class="${inc>0?'td-income':'td-dim'}">${fmt(inc)}</td>
+      <td style="color:var(--grn)">${r.refill||0}</td>
+      <td style="font-weight:700;color:${next<0?'var(--red)':'var(--txt)'}">${next}</td>
+      <td class="${inc>0?'td-warn':'td-dim'}">${fmt(inc)}</td>
     </tr>`;
-  }).join('') : `<tr><td colspan="9" style="text-align:center;color:var(--muted);padding:20px">No items with data.</td></tr>`;
+  }).join(''):`<tr><td colspan="9" style="text-align:center;color:var(--mut);padding:16px">No items entered.</td></tr>`;
 
-  const gcashHtml = (s.gcashEntries||[]).length
-    ? s.gcashEntries.map((v,i)=>`<div style="font-family:'Space Mono';color:var(--gcash);padding:2px 0;font-size:11px">Entry ${i+1}: ${fmt(v)}</div>`).join('')
-    : '<div style="color:var(--muted);font-size:11px">No GCash entries</div>';
+  const gcHtml=(s.gcashEntries||[]).length
+    ? s.gcashEntries.map((v,i)=>`<div style="font-family:'DM Mono';color:var(--blue);padding:2px 0;font-size:11px">Entry ${i+1}: ${fmt(v)}</div>`).join('')
+    : '<div style="color:var(--mut);font-size:11px">No GCash entries</div>';
 
-  document.getElementById('modalBody').innerHTML = `
-    <div class="stats-strip" style="margin-bottom:14px">
-      <div class="sstat"><div class="lbl">Total Income</div><div class="val" style="color:var(--warn)">${fmt(s.totalIncome)}</div></div>
-      <div class="sstat"><div class="lbl">GCash</div><div class="val" style="color:var(--gcash)">${fmt(s.gcash)}</div></div>
-      <div class="sstat"><div class="lbl">Cash</div><div class="val" style="color:var(--cash)">${fmt(s.cash)}</div></div>
+  document.getElementById('modalBody').innerHTML=`
+    <div class="stats" style="margin-bottom:12px">
+      <div class="stat"><div class="lbl">Total</div><div class="val" style="color:var(--warn)">${fmt(s.totalIncome)}</div></div>
+      <div class="stat"><div class="lbl">GCash</div><div class="val" style="color:var(--blue)">${fmt(s.gcash)}</div></div>
+      <div class="stat"><div class="lbl">Cash</div><div class="val" style="color:var(--acc)">${fmt(s.cash)}</div></div>
     </div>
-    <div class="tbl-wrap" style="margin-bottom:14px">
+    <div class="tbl-wrap" style="margin-bottom:12px">
       <table>
         <thead><tr>
           <th>Item</th><th>Price</th>
           <th style="color:var(--blue)">Start</th>
           <th style="color:var(--warn)">Sold</th>
-          <th style="color:var(--purple)">Comps</th>
-          <th style="color:var(--muted2)">End</th>
-          <th style="color:var(--green)">Refill</th>
-          <th>Next</th>
-          <th style="color:var(--warn)">Income</th>
+          <th style="color:var(--pur)">Comps</th>
+          <th style="color:var(--mut2)">End</th>
+          <th style="color:var(--grn)">Refill</th>
+          <th>Next</th><th style="color:var(--warn)">Income</th>
         </tr></thead>
-        <tbody>${rowsHtml}</tbody>
+        <tbody>${rHtml}</tbody>
       </table>
     </div>
-    <div>
-      <div class="section-title" style="margin-bottom:8px">GCash Breakdown</div>
-      ${gcashHtml}
-    </div>`;
+    <div><div class="sec" style="margin-bottom:6px">GCash Breakdown</div>${gcHtml}</div>`;
   document.getElementById('shiftModal').classList.add('open');
 }
 
-function loadEditShift(id) {
-  const s = salesLog.find(x=>x.id===id);
-  if (!s) return;
-  document.getElementById('posDate').value    = s.date;
-  document.getElementById('posShift').value   = s.shift;
-  document.getElementById('posWorker').value  = s.worker;
-  document.getElementById('posStatusSel').value = s.status||'Pending';
-  posRows = products.map(p => {
+function editShift(id){
+  const s=salesLog.find(x=>x.id===id);if(!s)return;
+  document.getElementById('posDate').value    =s.date;
+  document.getElementById('posShift').value   =s.shift;
+  document.getElementById('posWorker').value  =s.worker;
+  document.getElementById('posStatusSel').value=s.status||'Pending';
+  posRows=products.map(p=>{
     const r=(s.rows||[]).find(x=>x.name===p.name);
-    return r ? {...r} : {name:p.name,price:p.price,start:0,sold:0,comps:0,refill:0};
+    return r?{...r}:{name:p.name,price:p.price,start:0,sold:0,comps:0,refill:0};
   });
-  gcashEntries = [...(s.gcashEntries||[])];
-  renderPOS(); renderGcashUI();
-  showNote(`✏️ Editing ${s.shift} shift for ${s.date}. Save to update.`, 'warn');
-  switchTab('daily');
+  gcashEntries=[...(s.gcashEntries||[])];
+  renderPOS();renderGcashUI();
+  showNote(`✏️ Editing ${s.shift} shift for ${s.date}. Save to update.`,'warn');
+  switchTab('daily');closeModal();
 }
 
-async function delShift(id) {
-  if (!confirm('Delete this shift?')) return;
-  salesLog=salesLog.filter(s=>s.id!==id);
-  await dbDel('saleslog',id);
-  renderSalesLog();
-  toast('Shift deleted.');
+async function delShift(id){
+  if(!confirm('Delete this shift record?'))return;
+  try{
+    await apiPost({action:'deleteShift',id});
+    salesLog=salesLog.filter(s=>s.id!==id);
+    renderYearOverview();renderLogs();
+    toast('Shift deleted.');
+  }catch(e){toast('⚠ Delete failed','err');}
 }
 
-async function clearAllLogs() {
-  if (!confirm('Delete ALL shift logs? Cannot be undone.')) return;
-  salesLog=[];
-  await dbClear('saleslog');
-  renderSalesLog();
-  toast('All logs cleared.');
+async function clearAllLogs(){
+  if(!confirm('Delete ALL shift logs? Cannot be undone.'))return;
+  try{
+    await apiPost({action:'clearShifts'});
+    salesLog=[];
+    renderYearOverview();renderLogs();
+    toast('All logs cleared.');
+  }catch(e){toast('⚠ Failed','err');}
 }
 
-function closeModal() { document.getElementById('shiftModal').classList.remove('open'); }
-document.getElementById('shiftModal').addEventListener('click', e => {
-  if (e.target===document.getElementById('shiftModal')) closeModal();
+function closeModal(){document.getElementById('shiftModal').classList.remove('open');}
+document.getElementById('shiftModal').addEventListener('click',e=>{
+  if(e.target===document.getElementById('shiftModal'))closeModal();
 });
 
-// ══════════════════════════════════════════════
-// ─── TAB 3: STOCK ROOM ───
-// ══════════════════════════════════════════════
-function syncStockSelect() {
-  document.getElementById('stItem').innerHTML =
-    products.map(p=>`<option value="${p.name}">${p.name}</option>`).join('');
+// ══════════════════════════════════════════════════════
+//  STOCK ROOM
+// ══════════════════════════════════════════════════════
+function syncStockSelect(){
+  document.getElementById('stItem').innerHTML=products.map(p=>`<option value="${p.name}">${p.name}</option>`).join('');
 }
 
-async function addStock() {
-  const date   = document.getElementById('stDate').value||today();
-  const item   = document.getElementById('stItem').value;
-  const action = document.getElementById('stAction').value;
-  const qty    = parseInt(document.getElementById('stQty').value)||0;
-  const by     = (document.getElementById('stBy').value||'').toUpperCase()||'—';
-  if (!item||qty<=0) { toast('⚠ Fill all fields'); return; }
-
-  const prev      = stockMov.filter(e=>e.item===item);
-  const prevBal   = prev.length ? prev[prev.length-1].remaining : 0;
-  const remaining = action==='IN' ? prevBal+qty : prevBal-qty;
-  const entry = {
-    id: Date.now()+'_'+Math.random().toString(36).slice(2,7),
-    date, item, action, qty, remaining, takenBy: by, note:''
+async function addStock(){
+  const date  =document.getElementById('stDate').value||today();
+  const item  =document.getElementById('stItem').value;
+  const action=document.getElementById('stAction').value;
+  const qty   =parseInt(document.getElementById('stQty').value)||0;
+  const by    =(document.getElementById('stBy').value||currentUser||'').toUpperCase()||'—';
+  if(!item||qty<=0){toast('⚠ Fill all fields','warn');return;}
+  const prev   =stockMov.filter(e=>e.item===item);
+  const prevBal=prev.length?prev[prev.length-1].remaining:0;
+  const entry  ={
+    id:Date.now()+'_'+Math.random().toString(36).slice(2,6),
+    date,item,action,qty,remaining:action==='IN'?prevBal+qty:prevBal-qty,takenBy:by,note:''
   };
-  stockMov.push(entry);
-  await dbPut('stockmov', entry);
-  renderStockTable();
-  toast(`✅ ${action} ${qty}× ${item}`);
-  document.getElementById('stQty').value=1;
+  try{
+    await apiPost({action:'saveStock',data:entry});
+    stockMov.push(entry);
+    renderStockTable();
+    toast(`✅ ${action} ${qty}× ${item}`);
+    document.getElementById('stQty').value=1;
+  }catch(e){toast('⚠ Failed to save','err');}
 }
 
-function renderStockTable() {
-  const q   = (document.getElementById('stSearch')?.value||'').toLowerCase();
-  const all = [...stockMov].reverse();
-  const lst = q ? all.filter(e=>e.item.toLowerCase().includes(q)||e.date.includes(q)||(e.takenBy||'').toLowerCase().includes(q)) : all;
-  const tb  = document.getElementById('stBody');
-  if (!lst.length) {
-    tb.innerHTML=`<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:24px;font-family:'DM Sans'">No stock transactions yet.</td></tr>`;
-    return;
-  }
-  tb.innerHTML = lst.map((e,i)=>`<tr>
+function renderStockTable(){
+  const q  =(document.getElementById('stSearch')?.value||'').toLowerCase();
+  const all=[...stockMov].reverse();
+  const lst=q?all.filter(e=>e.item.toLowerCase().includes(q)||e.date.includes(q)||(e.takenBy||'').toLowerCase().includes(q)):all;
+  const tb =document.getElementById('stBody');
+  if(!lst.length){tb.innerHTML=`<tr><td colspan="8" style="text-align:center;color:var(--mut);padding:24px">No transactions yet.</td></tr>`;return;}
+  tb.innerHTML=lst.map((e,i)=>`<tr>
     <td class="td-dim">${lst.length-i}</td>
     <td>${e.date}</td>
-    <td class="td-label">${e.item}</td>
-    <td><span class="badge b-${e.action.toLowerCase()}">${e.action}</span></td>
+    <td class="td-lbl">${e.item}</td>
+    <td><span class="bdg b-${e.action.toLowerCase()}">${e.action}</span></td>
     <td>${e.qty}</td>
     <td class="${e.remaining<0?'td-neg':'td-pos'}">${e.remaining}</td>
     <td class="td-dim">${e.takenBy||'—'}</td>
-    <td><button class="btn btn-danger btn-sm" onclick='delStock("${e.id}")'>×</button></td>
+    <td><button class="btn btn-red btn-sm" onclick='delStock("${e.id}")'>×</button></td>
   </tr>`).join('');
 }
 
-async function delStock(id) {
-  if (!confirm('Delete this entry?')) return;
-  stockMov=stockMov.filter(e=>e.id!==id);
-  await dbDel('stockmov',id);
-  renderStockTable();
+async function delStock(id){
+  if(!confirm('Delete?'))return;
+  try{
+    await apiPost({action:'deleteStock',id});
+    stockMov=stockMov.filter(e=>e.id!==id);
+    renderStockTable();
+  }catch(e){toast('⚠ Failed','err');}
 }
 
-// ══════════════════════════════════════════════
-// ─── TAB 4: LIVE INVENTORY ───
-// ══════════════════════════════════════════════
-function renderLive() {
-  const q  = (document.getElementById('liveSearch')?.value||'').toLowerCase();
-  const ls = q ? products.filter(p=>p.name.toLowerCase().includes(q)) : products;
-  const tb = document.getElementById('liveBody');
-  tb.innerHTML = '';
-  ls.forEach(p => {
-    const logs     = stockMov.filter(e=>e.item===p.name);
-    const totalIn  = logs.filter(e=>e.action==='IN').reduce((s,e)=>s+e.qty,0);
-    const stockOut = logs.filter(e=>e.action==='OUT').reduce((s,e)=>s+e.qty,0);
-    let sold=0, comps=0;
-    salesLog.forEach(sh=>{
-      const r=(sh.rows||[]).find(r=>r.name===p.name);
-      if(r){ sold+=(r.sold||0); comps+=(r.comps||0); }
-    });
-    // Starting stock = first recorded Start value for this item across all shifts
-    let startingStock = 0;
-    if (salesLog.length) {
-      const firstShift = salesLog[0];
-      const fr = (firstShift.rows||[]).find(r=>r.name===p.name);
-      if (fr) startingStock = fr.start||0;
-    }
-    const totalOut  = stockOut + sold + comps;
-    const remaining = startingStock + totalIn - sold - comps - stockOut;
-    const denom     = startingStock + totalIn;
-    const pct       = denom>0 ? Math.max(0,Math.min(100,(remaining/denom)*100)) : 0;
-    const cls       = pct<20?'low':pct<50?'mid':'';
-    tb.innerHTML += `<tr>
-      <td class="td-label">${p.name}</td>
-      <td class="td-price">${fmt(p.price)}</td>
-      <td style="color:var(--green)">${startingStock}</td>
-      <td style="color:var(--green)">${totalIn}</td>
+// ══════════════════════════════════════════════════════
+//  LIVE INVENTORY
+// ══════════════════════════════════════════════════════
+function renderLive(){
+  const q =(document.getElementById('liveSearch')?.value||'').toLowerCase();
+  const ls=q?products.filter(p=>p.name.toLowerCase().includes(q)):products;
+  const tb=document.getElementById('liveBody');
+  tb.innerHTML='';
+  ls.forEach(p=>{
+    const logs    =stockMov.filter(e=>e.item===p.name);
+    const totalIn =logs.filter(e=>e.action==='IN').reduce((s,e)=>s+e.qty,0);
+    const stockOut=logs.filter(e=>e.action==='OUT').reduce((s,e)=>s+e.qty,0);
+    let sold=0,comps=0;
+    salesLog.forEach(sh=>{const r=(sh.rows||[]).find(r=>r.name===p.name);if(r){sold+=(r.sold||0);comps+=(r.comps||0);}});
+    let startStock=0;
+    if(salesLog.length){const fr=(salesLog[0].rows||[]).find(r=>r.name===p.name);if(fr)startStock=fr.start||0;}
+    const totalOut=stockOut+sold+comps;
+    const remaining=startStock+totalIn-sold-comps-stockOut;
+    const denom=startStock+totalIn;
+    const pct=denom>0?Math.max(0,Math.min(100,(remaining/denom)*100)):0;
+    const cls=pct<20?'low':pct<50?'mid':'';
+    tb.innerHTML+=`<tr>
+      <td class="td-lbl">${p.name}</td>
+      <td class="td-acc">${fmt(p.price)}</td>
+      <td style="color:var(--grn)">${startStock}</td>
+      <td style="color:var(--grn)">${totalIn}</td>
       <td style="color:var(--warn)">${sold}</td>
-      <td style="color:var(--purple)">${comps}</td>
-      <td style="color:var(--danger)">${totalOut}</td>
+      <td style="color:var(--pur)">${comps}</td>
+      <td style="color:var(--red)">${totalOut}</td>
       <td class="${remaining<0?'td-neg':remaining===0?'td-dim':'td-pos'}">${remaining}</td>
-      <td>
-        <div class="lvbar-wrap">
-          <div class="lvbar-track"><div class="lvbar-fill ${cls}" style="width:${pct}%"></div></div>
-          <span style="font-size:9px;color:var(--muted);min-width:30px">${Math.round(pct)}%</span>
-        </div>
-      </td>
+      <td><div class="prg">
+        <div class="prg-track"><div class="prg-fill ${cls}" style="width:${pct}%"></div></div>
+        <span style="font-size:9px;color:var(--mut);min-width:28px">${Math.round(pct)}%</span>
+      </div></td>
     </tr>`;
   });
 }
 
-// ══════════════════════════════════════════════
-// ─── TAB 5: LOYALTY CARDS ───
-// ══════════════════════════════════════════════
-async function saveLoyalty() {
-  const cardNum = (document.getElementById('lcNum').value||'').toUpperCase().trim();
-  const name    = document.getElementById('lcName').value.trim();
-  if (!cardNum||!name) { toast('⚠ Card # and Name required'); return; }
-  const card = {
-    cardNum, name,
-    expiry:   document.getElementById('lcExpiry').value||'',
-    stickers: parseInt(document.getElementById('lcStickers').value)||0,
-    reward:   document.getElementById('lcReward').value
-  };
-  const idx = loyCards.findIndex(c=>c.cardNum===cardNum);
-  if (idx>=0) loyCards[idx]=card; else loyCards.push(card);
-  await dbPut('loyalty', card);
-  renderLoyalty();
-  toast('✅ Card saved');
-  // Clear form
-  ['lcNum','lcName','lcExpiry'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('lcStickers').value=0;
-  document.getElementById('lcReward').value='None';
+// ══════════════════════════════════════════════════════
+//  LOYALTY
+// ══════════════════════════════════════════════════════
+async function saveLoyalty(){
+  const cardNum=(document.getElementById('lcNum').value||'').toUpperCase().trim();
+  const name   =document.getElementById('lcName').value.trim();
+  if(!cardNum||!name){toast('⚠ Card # and Name required','warn');return;}
+  const card={cardNum,name,expiry:document.getElementById('lcExpiry').value||'',
+    stickers:parseInt(document.getElementById('lcStickers').value)||0,
+    reward:document.getElementById('lcReward').value};
+  try{
+    await apiPost({action:'saveLoyalty',data:card});
+    const idx=loyCards.findIndex(c=>c.cardNum===cardNum);
+    if(idx>=0) loyCards[idx]=card; else loyCards.push(card);
+    renderLoyalty();toast('✅ Card saved');
+    ['lcNum','lcName','lcExpiry'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('lcStickers').value=0;
+    document.getElementById('lcReward').value='None';
+  }catch(e){toast('⚠ Failed','err');}
 }
 
-function renderLoyalty() {
-  const q  = (document.getElementById('lcSearch')?.value||'').toLowerCase();
-  const ls = q ? loyCards.filter(c=>c.name.toLowerCase().includes(q)||c.cardNum.toLowerCase().includes(q)) : loyCards;
-  const tb = document.getElementById('lcBody');
-  if (!ls.length) {
-    tb.innerHTML=`<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:24px;font-family:'DM Sans'">No loyalty cards yet.</td></tr>`;
-    return;
-  }
-  const GOAL=10;
-  tb.innerHTML = ls.map(c=>{
-    const pct  = Math.min(100, (c.stickers/GOAL)*100);
-    const rCls = c.reward==='Pending Claim'?'b-pend':c.reward==='Claimed'?'b-done':'td-dim';
+function renderLoyalty(){
+  const q =(document.getElementById('lcSearch')?.value||'').toLowerCase();
+  const ls=q?loyCards.filter(c=>c.name.toLowerCase().includes(q)||c.cardNum.toLowerCase().includes(q)):loyCards;
+  const tb=document.getElementById('lcBody');
+  if(!ls.length){tb.innerHTML=`<tr><td colspan="7" style="text-align:center;color:var(--mut);padding:24px">No cards yet.</td></tr>`;return;}
+  const G=10;
+  tb.innerHTML=ls.map(c=>{
+    const pct=Math.min(100,(c.stickers/G)*100);
+    const rc=c.reward==='Pending Claim'?'b-pend':c.reward==='Claimed'?'b-done':'td-dim';
     return `<tr>
-      <td style="font-family:'Space Mono';font-size:11px;color:var(--accent)">${c.cardNum}</td>
-      <td class="td-label">${c.name}</td>
+      <td style="font-family:'DM Mono';color:var(--acc)">${c.cardNum}</td>
+      <td class="td-lbl">${c.name}</td>
       <td class="td-dim">${c.expiry||'—'}</td>
-      <td style="font-family:'Space Mono'">${c.stickers}</td>
-      <td><span class="badge ${rCls}">${c.reward}</span></td>
-      <td>
-        <div class="lvbar-wrap">
-          <div class="lvbar-track"><div class="lvbar-fill" style="width:${pct}%;background:var(--purple)"></div></div>
-          <span style="font-size:9px;color:var(--muted)">${c.stickers}/${GOAL}</span>
-        </div>
-      </td>
+      <td style="font-family:'DM Mono'">${c.stickers}</td>
+      <td><span class="bdg ${rc}">${c.reward}</span></td>
+      <td><div class="prg">
+        <div class="prg-track"><div class="prg-fill" style="width:${pct}%;background:var(--pur)"></div></div>
+        <span style="font-size:9px;color:var(--mut)">${c.stickers}/${G}</span>
+      </div></td>
       <td style="display:flex;gap:4px">
         <button class="btn btn-ghost btn-sm" onclick='editCard("${c.cardNum}")'>✏️</button>
-        <button class="btn btn-danger btn-sm" onclick='delCard("${c.cardNum}")'>×</button>
+        <button class="btn btn-red btn-sm" onclick='delCard("${c.cardNum}")'>×</button>
       </td>
     </tr>`;
   }).join('');
 }
 
-function editCard(num) {
-  const c=loyCards.find(x=>x.cardNum===num);
-  if (!c) return;
-  document.getElementById('lcNum').value      = c.cardNum;
-  document.getElementById('lcName').value     = c.name;
-  document.getElementById('lcExpiry').value   = c.expiry||'';
-  document.getElementById('lcStickers').value = c.stickers;
-  document.getElementById('lcReward').value   = c.reward||'None';
+function editCard(num){
+  const c=loyCards.find(x=>x.cardNum===num);if(!c)return;
+  document.getElementById('lcNum').value     =c.cardNum;
+  document.getElementById('lcName').value    =c.name;
+  document.getElementById('lcExpiry').value  =c.expiry||'';
+  document.getElementById('lcStickers').value=c.stickers;
+  document.getElementById('lcReward').value  =c.reward||'None';
 }
 
-async function delCard(num) {
-  if (!confirm(`Delete card ${num}?`)) return;
-  loyCards=loyCards.filter(c=>c.cardNum!==num);
-  await dbDel('loyalty',num);
-  renderLoyalty();
+async function delCard(num){
+  if(!confirm(`Delete card ${num}?`))return;
+  try{
+    await apiPost({action:'deleteLoyalty',cardNum:num});
+    loyCards=loyCards.filter(c=>c.cardNum!==num);
+    renderLoyalty();
+  }catch(e){toast('⚠ Failed','err');}
 }
 
-// ══════════════════════════════════════════════
-// ─── TAB 6: ITEMS / PRODUCTS ───
-// ══════════════════════════════════════════════
-function renderItems() {
-  document.getElementById('itemsBody').innerHTML = products.map((p,i)=>`<tr>
+// ══════════════════════════════════════════════════════
+//  ITEMS
+// ══════════════════════════════════════════════════════
+function renderItems(){
+  document.getElementById('itemsBody').innerHTML=products.map((p,i)=>`<tr>
     <td class="td-dim">${i+1}</td>
-    <td class="td-label">${p.name}</td>
-    <td class="td-price">${fmt(p.price)}</td>
-    <td><input type="number" value="${p.price}" min="0" style="width:90px;font-size:11px;padding:4px 7px"
+    <td class="td-lbl">${p.name}</td>
+    <td class="td-acc">${fmt(p.price)}</td>
+    <td><input type="number" value="${p.price}" min="0" style="width:90px;font-size:12px;padding:5px 7px"
                onchange="updatePrice('${p.name}',this.value)"></td>
-    <td><button class="btn btn-danger btn-sm" onclick="delItem('${p.name}')">× Remove</button></td>
+    <td><button class="btn btn-red btn-sm" onclick="delItem('${p.name}')">× Remove</button></td>
   </tr>`).join('');
 }
 
-async function addItem() {
-  const name  = document.getElementById('newName').value.toUpperCase().trim();
-  const price = parseFloat(document.getElementById('newPrice').value)||0;
-  if (!name) { toast('⚠ Enter name'); return; }
-  if (products.find(p=>p.name===name)) { toast('⚠ Already exists'); return; }
-  const p = {name, price};
-  products.push(p);
-  await dbPut('products', p);
-  document.getElementById('newName').value='';
-  document.getElementById('newPrice').value='';
-  renderItems(); syncStockSelect();
-  // Add to posRows too
-  posRows.push({name,price,start:0,sold:0,comps:0,refill:0});
-  renderPOS();
-  toast(`✅ ${name} added`);
+async function addItem(){
+  const name =document.getElementById('newName').value.toUpperCase().trim();
+  const price=parseFloat(document.getElementById('newPrice').value)||0;
+  if(!name){toast('⚠ Enter name','warn');return;}
+  if(products.find(p=>p.name===name)){toast('⚠ Already exists','warn');return;}
+  const p={name,price};
+  try{
+    await apiPost({action:'saveProduct',data:p});
+    products.push(p);
+    document.getElementById('newName').value='';
+    document.getElementById('newPrice').value='';
+    renderItems();syncStockSelect();
+    posRows.push({name,price,start:0,sold:0,comps:0,refill:0});
+    toast(`✅ ${name} added`);
+  }catch(e){toast('⚠ Failed','err');}
 }
 
-async function updatePrice(name, val) {
+async function updatePrice(name,val){
   const price=parseFloat(val)||0;
-  const p=products.find(x=>x.name===name);
-  if (!p) return;
+  const p=products.find(x=>x.name===name);if(!p)return;
   p.price=price;
-  await dbPut('products',p);
-  const r=posRows.find(x=>x.name===name);
-  if (r) r.price=price;
-  renderPOS();
-  toast('Price updated');
+  try{
+    await apiPost({action:'saveProduct',data:p});
+    const r=posRows.find(x=>x.name===name);if(r)r.price=price;
+    renderPOS();toast('Price updated');
+  }catch(e){toast('⚠ Failed','err');}
 }
 
-async function delItem(name) {
-  if (!confirm(`Remove "${name}"?`)) return;
-  products=products.filter(p=>p.name!==name);
-  await dbDel('products',name);
-  posRows=posRows.filter(r=>r.name!==name);
-  renderItems(); renderPOS(); syncStockSelect();
-  toast('Item removed');
+async function delItem(name){
+  if(!confirm(`Remove "${name}"?`))return;
+  try{
+    await apiPost({action:'deleteProduct',name});
+    products=products.filter(p=>p.name!==name);
+    posRows=posRows.filter(r=>r.name!==name);
+    renderItems();renderPOS();syncStockSelect();
+    toast('Item removed');
+  }catch(e){toast('⚠ Failed','err');}
 }
 
-// ══════════════════════════════════════════════
-// BOOT
-// ══════════════════════════════════════════════
-(async () => {
+// ══════════════════════════════════════════════════════
+//  BOOT
+// ══════════════════════════════════════════════════════
+(async()=>{
+  // Ask for name if not set
+  if(currentUser){
+    document.getElementById('userBadge').textContent='👤 '+currentUser;
+  }
+
+  document.getElementById('loadMsg').textContent='Loading data from server…';
+
+  // Check if API URL is configured
+  if(API_URL==='PASTE_YOUR_WEB_APP_URL_HERE'){
+    document.getElementById('loadMsg').textContent='⚠ API URL not set — see SETUP_GUIDE.md';
+    document.getElementById('loadScreen').innerHTML+=`
+      <div style="background:#1e2430;border:1px solid #2a3445;border-radius:8px;padding:20px;max-width:360px;text-align:center">
+        <div style="color:#ffb547;font-family:'Syne',sans-serif;font-size:16px;margin-bottom:10px">Setup Required</div>
+        <div style="color:#8492aa;font-size:12px;line-height:1.6">
+          You need to connect this app to Google Sheets.<br><br>
+          Follow the <b style="color:#dde3ee">SETUP_GUIDE.md</b> included in your download.
+          It takes about 10 minutes.
+        </div>
+      </div>`;
+    return;
+  }
+
   try {
-    await openDB();
-    await loadAll();
-    document.getElementById('stDate').value = today();
+    await refreshAll();
+    document.getElementById('loadScreen').style.display='none';
+    document.getElementById('stDate').value=today();
+
+    // Set active tab
     switchTab('daily');
-    initPOS();
+
+    // Set nav active state
+    document.querySelectorAll('.tnav-btn')[0].classList.add('active');
+    document.getElementById('bn-daily').classList.add('active');
+
+    // Init POS
+    posRows=products.map(p=>({name:p.name,price:p.price,start:0,sold:0,comps:0,refill:0}));
     syncStockSelect();
-  } catch(err) {
-    console.error(err);
-    document.body.innerHTML=`<div style="padding:40px;color:#ff4d6a;font-family:sans-serif">
-      <b>⚠ Database Error:</b> ${err.message}<br><br>
-      Make sure you're not in Private/Incognito mode.</div>`;
+    initPOS();
+
+    setSyncState('ok');
+  }catch(e){
+    document.getElementById('loadMsg').textContent='⚠ Could not connect to server. Check your API URL.';
+    setSyncState('err');
   }
 })();
 </script>
