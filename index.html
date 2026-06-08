@@ -244,7 +244,8 @@ hr{border:none;border-top:1px solid var(--bdr);margin:11px 0;}
     <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px">
       <button class="btn btn-acc" onclick="saveShift()" style="flex:1;min-width:120px">💾 Save Shift</button>
       <button class="btn btn-ghost" onclick="clearPOS()">↺ Clear</button>
-      <button class="btn btn-ghost btn-sm" onclick="loadShiftFromServer()" title="Reload from server">⟳</button>
+      <button class="btn btn-ghost btn-sm" onclick="loadShiftFromServer()" title="Reload from server">⟳ Reload</button>
+      <button class="btn btn-ghost btn-sm" onclick="debugShifts()" title="Debug: show what shifts are in memory">🔍 Debug</button>
     </div>
     <div id="posNote" class="note"></div>
 
@@ -464,7 +465,7 @@ hr{border:none;border-top:1px solid var(--bdr);margin:11px 0;}
 // ════════════════════════════════════════════════════════════
 //  ▼▼ PASTE YOUR GOOGLE APPS SCRIPT URL ON THE NEXT LINE ▼▼
 // ════════════════════════════════════════════════════════════
-const API_URL = 'https://script.google.com/macros/s/AKfycbxFHuw41PwWQrAhWbv6wOcjIgrwStISHZQ2AeW72j-uvZtGZZsvmCJNOI2ZuWrir2fy/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbybMwBsMRYFo6Mpxxg_uvgUL7dBb7exRjYeSPXDnC9GYZ1-GrPLOD6MLK--iyu1ROEg/exec';
 // ════════════════════════════════════════════════════════════
 // How to get your URL:
 //   script.google.com → your project → Deploy → Manage deployments → copy URL
@@ -653,35 +654,47 @@ async function loadShiftFromServer(){
   const shift=document.getElementById('posShift').value;
   if(!date) return;
 
-  showNote('⏳ Loading…','info');
+  showNote('⏳ Loading from server…','info');
 
-  // Always get fresh data from server first
+  // Always get fresh data from server
   try{
     await doRefresh();
   }catch(e){
-    // Use cached data if offline
+    showNote('⚠ Offline — showing cached data','warn');
   }
 
-  const existing=salesLog.find(s=>s.date===date && s.shift===shift);
+  // Debug: log what we got so you can see in browser console
+  console.log('Looking for shift:', date, shift);
+  console.log('All shifts in memory:', salesLog.map(s=>s.date+'_'+s.shift));
+
+  // Normalize comparison — trim and exact match
+  const existing = salesLog.find(s =>
+    String(s.date).trim() === String(date).trim() &&
+    String(s.shift).trim() === String(shift).trim()
+  );
+
+  console.log('Found existing:', existing ? 'YES' : 'NO');
 
   if(existing){
     // ── EXISTING SHIFT: load saved data exactly as-is ──
-    document.getElementById('posWorker').value     = existing.worker||currentUser||'';
-    document.getElementById('posStatusSel').value  = existing.status||'Pending';
+    document.getElementById('posWorker').value    = existing.worker||currentUser||'';
+    document.getElementById('posStatusSel').value = existing.status||'Pending';
 
-    // Build rows: use saved row data, fill in any new products that weren't in original
     posRows = products.map(p=>{
       const saved=(existing.rows||[]).find(x=>x.name===p.name);
       if(saved){
-        // Always use saved numbers, but refresh price from products master
-        return { name:p.name, price:p.price, start:saved.start||0, sold:saved.sold||0, comps:saved.comps||0, refill:saved.refill||0 };
+        return { name:p.name, price:p.price,
+                 start:  Number(saved.start)  ||0,
+                 sold:   Number(saved.sold)   ||0,
+                 comps:  Number(saved.comps)  ||0,
+                 refill: Number(saved.refill) ||0 };
       }
       return {name:p.name, price:p.price, start:0, sold:0, comps:0, refill:0};
     });
     gcashEntries=[...(existing.gcashEntries||[])];
 
     showNote(
-      `📂 ${shift} shift · ${date} · Worker: ${existing.worker||'?'} · Status: ${existing.status||'Pending'}`,
+      `📂 Loaded: ${shift} shift · ${date} · Worker: ${existing.worker||'?'} · Status: ${existing.status||'Pending'}`,
       'warn'
     );
   } else {
@@ -691,25 +704,22 @@ async function loadShiftFromServer(){
 
     const src=getPrevSource(date,shift);
     if(src){
-      // For each item, Next = (Start - Sold - Comps) + Refill from previous shift
       (src.rows||[]).forEach(sr=>{
         const row=posRows.find(r=>r.name===sr.name);
         if(row){
-          const prevEnd  = (sr.start||0) - (sr.sold||0) - (sr.comps||0);
-          const prevNext = prevEnd + (sr.refill||0);
+          const prevEnd  = (Number(sr.start)||0) - (Number(sr.sold)||0) - (Number(sr.comps)||0);
+          const prevNext = prevEnd + (Number(sr.refill)||0);
           row.start = Math.max(0, prevNext);
         }
       });
       showNote(
-        `✅ New ${shift} shift · Start stock filled from ${src.shift} on ${src.date} (${src.worker||'?'})`,
+        `✅ New ${shift} shift · ${date} · Start filled from ${src.shift} on ${src.date} (${src.worker||'?'})`,
         'info'
       );
     } else {
-      // No previous shift at all — fresh start
       showNote(`🆕 New ${shift} shift for ${date} · No previous shift found · Enter starting stock manually`, 'info');
     }
 
-    // Pre-fill worker name
     if(currentUser) document.getElementById('posWorker').value=currentUser;
   }
 
@@ -906,6 +916,22 @@ function updateRow(i, field, val){
   }
   // Recalc totals
   recalcTotals();
+}
+
+function debugShifts(){
+  const date  = document.getElementById('posDate').value;
+  const shift = document.getElementById('posShift').value;
+  const all   = salesLog.map(s=>`${s.date} | ${s.shift} | ${s.worker}`).join('\n');
+  const match = salesLog.filter(s=>
+    String(s.date).trim()===String(date).trim() &&
+    String(s.shift).trim()===String(shift).trim()
+  );
+  alert(
+    `Looking for: ${date} | ${shift}\n` +
+    `Match found: ${match.length>0 ? 'YES ✅' : 'NO ❌'}\n` +
+    `Total shifts in memory: ${salesLog.length}\n\n` +
+    (all || '(none)')
+  );
 }
 
 function recalcTotals(){
