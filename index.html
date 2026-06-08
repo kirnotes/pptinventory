@@ -173,16 +173,6 @@ tr:hover td{background:rgba(255,255,255,.01);}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 @media(min-width:700px){#toast{bottom:24px;}}
 
-/* SETUP SCREEN */
-#setupScreen{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;gap:14px;z-index:999;text-align:center;}
-.setup-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:28px;letter-spacing:5px;color:var(--acc);}
-.setup-logo em{color:var(--mut2);font-style:normal;}
-.setup-box{background:var(--sur);border:1px solid var(--bdr2);border-radius:10px;padding:22px;width:100%;max-width:420px;}
-.setup-box h2{font-family:'Syne',sans-serif;font-size:14px;font-weight:800;letter-spacing:1px;color:var(--txt);margin-bottom:8px;}
-.setup-box p{font-size:12px;color:var(--mut2);line-height:1.6;margin-bottom:14px;}
-.setup-box input{margin-bottom:10px;font-size:13px;}
-.spin{width:22px;height:22px;border:2px solid var(--bdr2);border-top-color:var(--acc);border-radius:50%;animation:sp .6s linear infinite;}
-@keyframes sp{to{transform:rotate(360deg);}}
 #setupMsg{font-size:12px;color:var(--mut);font-family:'DM Sans',sans-serif;}
 
 hr{border:none;border-top:1px solid var(--bdr);margin:11px 0;}
@@ -194,22 +184,13 @@ hr{border:none;border-top:1px solid var(--bdr);margin:11px 0;}
 </head>
 <body>
 
-<!-- SETUP / LOADING SCREEN -->
-<div id="setupScreen">
-  <div class="setup-logo">TPP <em>INVENTORY</em></div>
-  <div class="spin" id="setupSpin"></div>
-  <div id="setupMsg">Connecting…</div>
-  <!-- This box shown only if URL not configured -->
-  <div class="setup-box" id="setupBox" style="display:none">
-    <h2>🔗 Connect to Google Sheets</h2>
-    <p>Paste your Google Apps Script Web App URL below.<br>
-       This connects all devices to the same shared data.</p>
-    <label>Web App URL</label>
-    <input type="url" id="apiInput" placeholder="https://script.google.com/macros/s/.../exec">
-    <button class="btn btn-acc btn-full" onclick="connectAPI()">Connect & Load Data</button>
-    <div id="apiErr" style="color:var(--red);font-size:11px;margin-top:8px;display:none"></div>
-  </div>
+<!-- LOADING SCREEN -->
+<div id="loadScreen" style="position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:999">
+  <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:28px;letter-spacing:5px;color:var(--acc)">TPP <em style="color:#8492aa;font-style:normal">INVENTORY</em></div>
+  <div style="width:22px;height:22px;border:2px solid #1e2736;border-top-color:#00f0a0;border-radius:50%;animation:sp .6s linear infinite"></div>
+  <div id="loadMsg" style="font-size:12px;color:#5a6478;font-family:'DM Sans',sans-serif">Loading data…</div>
 </div>
+<style>@keyframes sp{to{transform:rotate(360deg);}}</style>
 
 <header>
   <div class="logo">TPP <em>INV</em></div>
@@ -244,9 +225,9 @@ hr{border:none;border-top:1px solid var(--bdr);margin:11px 0;}
   <div class="card">
     <div class="sec">Shift Info</div>
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:9px;align-items:end;margin-bottom:11px">
-      <div><label>Date</label><input type="date" id="posDate" onchange="posMetaChanged()"></div>
+      <div><label>Date</label><input type="date" id="posDate" onchange="onDateShiftChange()"></div>
       <div><label>Shift</label>
-        <select id="posShift" onchange="posMetaChanged()">
+        <select id="posShift" onchange="onDateShiftChange()">
           <option value="AM">AM</option>
           <option value="PM">PM</option>
           <option value="WD">Whole Day</option>
@@ -254,7 +235,7 @@ hr{border:none;border-top:1px solid var(--bdr);margin:11px 0;}
       </div>
       <div><label>Worker</label><input type="text" id="posWorker" placeholder="Your name" style="text-transform:uppercase"></div>
       <div><label>Status</label>
-        <select id="posStatus">
+        <select id="posStatusSel">
           <option value="Pending">Pending</option>
           <option value="Ready">Ready ✓</option>
         </select>
@@ -480,10 +461,14 @@ hr{border:none;border-top:1px solid var(--bdr);margin:11px 0;}
 <div id="toast"></div>
 
 <script>
-// ══════════════════════════════════════════════════
-//  CONFIG — saved in localStorage so it persists
-// ══════════════════════════════════════════════════
-let API_URL = localStorage.getItem('tpp_api') || '';
+// ════════════════════════════════════════════════════════════
+//  ▼▼ PASTE YOUR GOOGLE APPS SCRIPT URL ON THE NEXT LINE ▼▼
+// ════════════════════════════════════════════════════════════
+const API_URL = 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE';
+// ════════════════════════════════════════════════════════════
+// How to get your URL:
+//   script.google.com → your project → Deploy → Manage deployments → copy URL
+// ════════════════════════════════════════════════════════════
 
 // ══════════════════════════════════════════════════
 //  STATE
@@ -565,36 +550,15 @@ function shiftSort(a,b){
 //  SETUP SCREEN
 // ══════════════════════════════════════════════════
 async function startApp(){
-  document.getElementById('setupSpin').style.display='block';
-  document.getElementById('setupMsg').textContent='Connecting to Google Sheets…';
-  document.getElementById('setupBox').style.display='none';
-  document.getElementById('apiErr').style.display='none';
+  document.getElementById('loadMsg').textContent='Loading data from Google Sheets…';
   try {
     await doRefresh();
-    // Success — hide setup, show app
-    document.getElementById('setupScreen').style.display='none';
+    document.getElementById('loadScreen').style.display='none';
     initApp();
   } catch(e) {
-    document.getElementById('setupSpin').style.display='none';
-    document.getElementById('setupMsg').textContent='Could not connect.';
-    document.getElementById('setupBox').style.display='block';
-    document.getElementById('apiInput').value = API_URL;
-    const errEl=document.getElementById('apiErr');
-    errEl.textContent='Error: '+e.message+' — Check your URL and make sure the script is deployed as "Anyone" access.';
-    errEl.style.display='block';
+    document.getElementById('loadMsg').textContent='⚠ Could not connect: '+e.message;
+    document.getElementById('loadMsg').style.color='var(--red)';
   }
-}
-
-async function connectAPI(){
-  const url = document.getElementById('apiInput').value.trim();
-  if(!url || !url.startsWith('http')){
-    document.getElementById('apiErr').textContent='Please paste a valid URL.';
-    document.getElementById('apiErr').style.display='block';
-    return;
-  }
-  API_URL = url;
-  localStorage.setItem('tpp_api', url);
-  await startApp();
 }
 
 function initApp(){
@@ -663,65 +627,132 @@ function switchTab(name){
 // ══════════════════════════════════════════════════
 //  DAILY POS
 // ══════════════════════════════════════════════════
-function initPOS(){
-  document.getElementById('posDate').value=today();
-  posMetaChanged();
+
+// Called only when date OR shift selector changes
+function onDateShiftChange(){
+  loadShiftFromServer();
 }
 
-function posMetaChanged(){ loadShiftFromServer(); }
+function initPOS(){
+  document.getElementById('posDate').value=today();
+  // Don't auto-load on init — wait for explicit date/shift change or manual reload
+  buildFreshRows();
+  renderPOS();
+  renderGcashUI();
+}
 
+// Build empty rows from current products list
+function buildFreshRows(){
+  posRows=products.map(p=>({name:p.name,price:p.price,start:0,sold:0,comps:0,refill:0}));
+  gcashEntries=[];
+}
+
+// Main loader — fetches fresh data then populates form
 async function loadShiftFromServer(){
   const date =document.getElementById('posDate').value;
   const shift=document.getElementById('posShift').value;
-  if(!date)return;
+  if(!date) return;
 
-  // Refresh from server
-  try{ await doRefresh(); }catch(e){ /* use cached */ }
+  showNote('⏳ Loading…','info');
 
-  const existing=salesLog.find(s=>s.date===date&&s.shift===shift);
+  // Always get fresh data from server first
+  try{
+    await doRefresh();
+  }catch(e){
+    // Use cached data if offline
+  }
+
+  const existing=salesLog.find(s=>s.date===date && s.shift===shift);
+
   if(existing){
-    document.getElementById('posWorker').value    =existing.worker||currentUser||'';
-    document.getElementById('posStatus').value    =existing.status||'Pending';
-    posRows=products.map(p=>{
-      const r=(existing.rows||[]).find(x=>x.name===p.name);
-      return r?{...r}:{name:p.name,price:p.price,start:0,sold:0,comps:0,refill:0};
+    // ── EXISTING SHIFT: load saved data exactly as-is ──
+    document.getElementById('posWorker').value     = existing.worker||currentUser||'';
+    document.getElementById('posStatusSel').value  = existing.status||'Pending';
+
+    // Build rows: use saved row data, fill in any new products that weren't in original
+    posRows = products.map(p=>{
+      const saved=(existing.rows||[]).find(x=>x.name===p.name);
+      if(saved){
+        // Always use saved numbers, but refresh price from products master
+        return { name:p.name, price:p.price, start:saved.start||0, sold:saved.sold||0, comps:saved.comps||0, refill:saved.refill||0 };
+      }
+      return {name:p.name, price:p.price, start:0, sold:0, comps:0, refill:0};
     });
     gcashEntries=[...(existing.gcashEntries||[])];
-    showNote(`📂 Loaded ${shift} shift · ${date} · saved by ${existing.worker||'?'} · ${existing.status||'Pending'}`,'warn');
+
+    showNote(
+      `📂 ${shift} shift · ${date} · Worker: ${existing.worker||'?'} · Status: ${existing.status||'Pending'}`,
+      'warn'
+    );
   } else {
+    // ── NEW SHIFT: auto-fill Start from the correct previous shift ──
     posRows=products.map(p=>({name:p.name,price:p.price,start:0,sold:0,comps:0,refill:0}));
     gcashEntries=[];
+
     const src=getPrevSource(date,shift);
     if(src){
+      // For each item, Next = (Start - Sold - Comps) + Refill from previous shift
       (src.rows||[]).forEach(sr=>{
         const row=posRows.find(r=>r.name===sr.name);
         if(row){
-          const end=(sr.start||0)-(sr.sold||0)-(sr.comps||0);
-          row.start=Math.max(0,end+(sr.refill||0));
+          const prevEnd  = (sr.start||0) - (sr.sold||0) - (sr.comps||0);
+          const prevNext = prevEnd + (sr.refill||0);
+          row.start = Math.max(0, prevNext);
         }
       });
-      showNote(`✅ Start filled from ${src.shift} on ${src.date} (${src.worker||'?'})`,'info');
+      showNote(
+        `✅ New ${shift} shift · Start stock filled from ${src.shift} on ${src.date} (${src.worker||'?'})`,
+        'info'
+      );
     } else {
-      hideNote();
+      // No previous shift at all — fresh start
+      showNote(`🆕 New ${shift} shift for ${date} · No previous shift found · Enter starting stock manually`, 'info');
     }
+
+    // Pre-fill worker name
+    if(currentUser) document.getElementById('posWorker').value=currentUser;
   }
-  renderPOS(); renderGcashUI();
+
+  renderPOS();
+  renderGcashUI();
 }
 
+// ── PREVIOUS SHIFT SOURCE LOGIC ──
+// AM  → last shift of the most recent previous day
+// PM  → AM of the SAME day (if exists), else last shift of previous day
+// WD  → PM of previous day → WD of prev day → AM of prev day → any earlier
 function getPrevSource(date,shift){
   if(shift==='PM'){
-    return salesLog.find(s=>s.date===date&&s.shift==='AM')||lastBefore(date);
+    // First look for AM same day
+    const sameAM=salesLog.find(s=>s.date===date && s.shift==='AM');
+    if(sameAM) return sameAM;
+    return lastShiftBeforeDate(date);
   }
   if(shift==='WD'){
-    const pd=prevDate(date);
-    return (pd&&(salesLog.find(s=>s.date===pd&&s.shift==='PM')||
-                 salesLog.find(s=>s.date===pd&&s.shift==='WD')||
-                 salesLog.find(s=>s.date===pd&&s.shift==='AM')))||lastBefore(date);
+    const pd=latestDateBefore(date);
+    if(pd){
+      return salesLog.find(s=>s.date===pd && s.shift==='PM')
+          || salesLog.find(s=>s.date===pd && s.shift==='WD')
+          || salesLog.find(s=>s.date===pd && s.shift==='AM');
+    }
+    return null;
   }
-  return lastBefore(date);
+  // AM → last shift of any previous day
+  return lastShiftBeforeDate(date);
 }
-function lastBefore(d){const b=salesLog.filter(s=>s.date<d);return b.length?b[b.length-1]:null;}
-function prevDate(d){const ds=[...new Set(salesLog.filter(s=>s.date<d).map(s=>s.date))].sort();return ds.length?ds[ds.length-1]:null;}
+
+function lastShiftBeforeDate(date){
+  // Get all shifts strictly before this date, sorted, take the last one
+  const before=salesLog.filter(s=>s.date<date);
+  if(!before.length) return null;
+  // Return the one with the latest date+shift order
+  return before[before.length-1];
+}
+
+function latestDateBefore(date){
+  const dates=[...new Set(salesLog.filter(s=>s.date<date).map(s=>s.date))].sort();
+  return dates.length ? dates[dates.length-1] : null;
+}
 
 function renderPOS(){
   let tRows='', mCards='';
@@ -735,14 +766,14 @@ function renderPOS(){
       <td class="tl">${r.name}</td>
       <td class="ta">${fmt(r.price)}</td>
       <td><input type="number" class="pi" min="0" value="${r.start||0}" style="color:var(--blue)"
-           oninput="posRows[${i}].start=+this.value||0;renderPOS()"></td>
+           oninput="updateRow(${i},'start',this.value)"></td>
       <td><input type="number" class="pi" min="0" value="${r.sold||0}" style="color:var(--warn)"
-           oninput="posRows[${i}].sold=+this.value||0;renderPOS()"></td>
+           oninput="updateRow(${i},'sold',this.value)"></td>
       <td><input type="number" class="pi" min="0" value="${r.comps||0}" style="color:var(--pur)"
-           oninput="posRows[${i}].comps=+this.value||0;renderPOS()"></td>
+           oninput="updateRow(${i},'comps',this.value)"></td>
       <td class="${endC}">${end}</td>
       <td><input type="number" class="pi" min="0" value="${r.refill||0}" style="color:var(--grn)"
-           oninput="posRows[${i}].refill=+this.value||0;renderPOS()"></td>
+           oninput="updateRow(${i},'refill',this.value)"></td>
       <td style="font-weight:700;${nexC}">${next}</td>
       <td class="${inc>0?'tw':'td'}">${fmt(inc)}</td>
     </tr>`;
@@ -750,17 +781,17 @@ function renderPOS(){
       <div class="mc-name"><span>${r.name}</span><span class="ta" style="font-size:11px">${fmt(r.price)}</span></div>
       <div class="mc-grid">
         <div class="mcf"><label>Start</label><input type="number" class="pi" min="0" value="${r.start||0}"
-             style="width:100%;color:var(--blue)" oninput="posRows[${i}].start=+this.value||0;renderPOS()"></div>
+             style="width:100%;color:var(--blue)" oninput="updateRow(${i},'start',this.value)"></div>
         <div class="mcf"><label>Sold</label><input type="number" class="pi" min="0" value="${r.sold||0}"
-             style="width:100%;color:var(--warn)" oninput="posRows[${i}].sold=+this.value||0;renderPOS()"></div>
+             style="width:100%;color:var(--warn)" oninput="updateRow(${i},'sold',this.value)"></div>
         <div class="mcf"><label>Comps</label><input type="number" class="pi" min="0" value="${r.comps||0}"
-             style="width:100%;color:var(--pur)" oninput="posRows[${i}].comps=+this.value||0;renderPOS()"></div>
+             style="width:100%;color:var(--pur)" oninput="updateRow(${i},'comps',this.value)"></div>
         <div class="mcf"><label>Refill</label><input type="number" class="pi" min="0" value="${r.refill||0}"
-             style="width:100%;color:var(--grn)" oninput="posRows[${i}].refill=+this.value||0;renderPOS()"></div>
+             style="width:100%;color:var(--grn)" oninput="updateRow(${i},'refill',this.value)"></div>
         <div class="mcf"><label>End</label><div style="font-family:'DM Mono';font-size:13px;padding:7px 6px;color:${end<0?'var(--red)':'var(--mut)'}">${end}</div></div>
         <div class="mcf"><label>Next</label><div style="font-family:'DM Mono';font-size:13px;padding:7px 6px;font-weight:700;color:${next<0?'var(--red)':'var(--txt)'}">${next}</div></div>
       </div>
-      ${inc>0?`<div style="text-align:right;font-family:'DM Mono';font-size:11px;color:var(--warn);margin-top:6px;padding-top:6px;border-top:1px solid var(--bdr)">Income: ${fmt(inc)}</div>`:''}
+      <div class="mc-income" style="text-align:right;font-family:'DM Mono';font-size:11px;color:${inc>0?'var(--warn)':' var(--mut)'};margin-top:6px;padding-top:6px;border-top:1px solid var(--bdr)">Income: ${fmt(inc)}</div>
     </div>`;
   });
 
@@ -772,15 +803,8 @@ function renderPOS(){
   const cash =total-gc;
   const sold =posRows.filter(r=>(r.sold||0)>0).length;
 
-  document.getElementById('posFoot').innerHTML=`<tr>
-    <td colspan="8" style="text-align:right;font-size:9px;color:var(--mut);font-family:'DM Sans';letter-spacing:1px;text-transform:uppercase;padding:9px">Total Shift Income</td>
-    <td style="font-family:'Syne';font-weight:800;font-size:18px;color:var(--warn);padding:9px">${fmt(total)}</td>
-  </tr>`;
-  document.getElementById('cTotal').textContent=fmt(total);
-  document.getElementById('cGcash').textContent=fmt(gc);
-  document.getElementById('cCash').textContent =fmt(cash);
-  document.getElementById('cItems').textContent=sold;
-  document.getElementById('gcashBig').textContent=fmt(gc);
+  // Recalculate totals after full render
+  recalcTotals();
 }
 
 function clearPOS(){
@@ -793,7 +817,7 @@ async function saveShift(){
   const date  =document.getElementById('posDate').value;
   const shift =document.getElementById('posShift').value;
   const worker=(document.getElementById('posWorker').value||currentUser||'').toUpperCase().trim()||'—';
-  const status=document.getElementById('posStatus').value;
+  const status=document.getElementById('posStatusSel').value;
   if(!date){toast('⚠ Pick a date','warn');return;}
 
   const total=posRows.reduce((s,r)=>s+(r.sold||0)*r.price,0);
@@ -830,11 +854,75 @@ function renderGcashUI(){
   document.getElementById('gcashList').innerHTML=gcashEntries.map((v,i)=>`
     <div class="gc-row">
       <input type="number" value="${v||''}" placeholder="Amount"
-             oninput="gcashEntries[${i}]=parseFloat(this.value)||0;renderPOS()">
-      <button class="btn btn-red btn-sm" onclick="gcashEntries.splice(${i},1);renderGcashUI();renderPOS()">×</button>
+             oninput="gcashEntries[${i}]=parseFloat(this.value)||0;recalcTotals()">
+      <button class="btn btn-red btn-sm" onclick="gcashEntries.splice(${i},1);renderGcashUI();recalcTotals()">×</button>
     </div>`).join('');
 }
 function addGcash(){gcashEntries.push(0);renderGcashUI();}
+
+// Update a single row value without re-rendering the whole table
+// Then recalculate just that row's End, Next, Income display
+function updateRow(i, field, val){
+  posRows[i][field] = parseFloat(val)||0;
+  // Recalculate End, Next, Income for this row only
+  const r    = posRows[i];
+  const end  = (r.start||0)-(r.sold||0)-(r.comps||0);
+  const next = end+(r.refill||0);
+  const inc  = (r.sold||0)*r.price;
+  // Update the read-only cells in the desktop table
+  const rows = document.getElementById('posBody').querySelectorAll('tr');
+  if(rows[i]){
+    const cells=rows[i].querySelectorAll('td');
+    // td indices: 0=name,1=price,2=start,3=sold,4=comps,5=end,6=refill,7=next,8=income
+    if(cells[5]){
+      cells[5].textContent=end;
+      cells[5].className=end<0?'tn':'td';
+    }
+    if(cells[7]){
+      cells[7].textContent=next;
+      cells[7].style.color=next<0?'var(--red)':'var(--txt)';
+    }
+    if(cells[8]){
+      cells[8].textContent=inc>0?fmt(inc):'₱0';
+      cells[8].className=inc>0?'tw':'td';
+    }
+  }
+  // Update mobile card End and Next display
+  const cards=document.getElementById('posCards').querySelectorAll('.m-card');
+  if(cards[i]){
+    const divs=cards[i].querySelectorAll('.mcf');
+    // divs: 0=start,1=sold,2=comps,3=refill,4=end,5=next
+    if(divs[4]){
+      const endEl=divs[4].querySelector('div');
+      if(endEl){endEl.textContent=end;endEl.style.color=end<0?'var(--red)':'var(--mut)';}
+    }
+    if(divs[5]){
+      const nextEl=divs[5].querySelector('div');
+      if(nextEl){nextEl.textContent=next;nextEl.style.color=next<0?'var(--red)':'var(--txt)';}
+    }
+    // Update income line
+    const incEl=cards[i].querySelector('.mc-income');
+    if(incEl) incEl.textContent='Income: '+fmt(inc);
+  }
+  // Recalc totals
+  recalcTotals();
+}
+
+function recalcTotals(){
+  const total=posRows.reduce((s,r)=>s+(r.sold||0)*r.price,0);
+  const gc   =gcashEntries.reduce((s,v)=>s+(parseFloat(v)||0),0);
+  const cash =total-gc;
+  const sold =posRows.filter(r=>(r.sold||0)>0).length;
+  document.getElementById('posFoot').innerHTML=`<tr>
+    <td colspan="8" style="text-align:right;font-size:9px;color:var(--mut);font-family:'DM Sans';letter-spacing:1px;text-transform:uppercase;padding:9px">Total Shift Income</td>
+    <td style="font-family:'Syne';font-weight:800;font-size:18px;color:var(--warn);padding:9px">${fmt(total)}</td>
+  </tr>`;
+  document.getElementById('cTotal').textContent=fmt(total);
+  document.getElementById('cGcash').textContent=fmt(gc);
+  document.getElementById('cCash').textContent =fmt(cash);
+  document.getElementById('cItems').textContent=sold;
+  document.getElementById('gcashBig').textContent=fmt(gc);
+}
 
 // ══════════════════════════════════════════════════
 //  LOGS
@@ -1037,7 +1125,7 @@ function editShift(id){
   document.getElementById('posDate').value   =s.date;
   document.getElementById('posShift').value  =s.shift;
   document.getElementById('posWorker').value =s.worker;
-  document.getElementById('posStatus').value =s.status||'Pending';
+  document.getElementById('posStatusSel').value =s.status||'Pending';
   posRows=products.map(p=>{
     const r=(s.rows||[]).find(x=>x.name===p.name);
     return r?{...r}:{name:p.name,price:p.price,start:0,sold:0,comps:0,refill:0};
@@ -1271,15 +1359,13 @@ async function delItem(name){
 (async()=>{
   if(currentUser) document.getElementById('usrBtn').textContent='👤 '+currentUser;
 
-  if(!API_URL){
-    // No URL stored — show setup screen with input box
-    document.getElementById('setupSpin').style.display='none';
-    document.getElementById('setupMsg').textContent='Connect your Google Sheet to get started.';
-    document.getElementById('setupBox').style.display='block';
+  if(!API_URL || API_URL === 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE'){
+    document.getElementById('loadMsg').innerHTML=
+      '⚠ API URL not set.<br><span style="font-size:10px">Open index.html and paste your Apps Script URL where it says YOUR_GOOGLE_APPS_SCRIPT_URL_HERE</span>';
+    document.getElementById('loadMsg').style.color='var(--warn)';
     return;
   }
 
-  // URL exists — try to connect
   await startApp();
 })();
 </script>
