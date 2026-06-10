@@ -580,7 +580,7 @@ input[type=file]{display:none;}
 // ════════════════════════════════════════════════════════════
 //  ▼▼ PASTE YOUR GOOGLE APPS SCRIPT URL ON THE NEXT LINE ▼▼
 // ════════════════════════════════════════════════════════════
-const API_URL = 'https://script.google.com/macros/s/AKfycbx9kPaPZxBA7fIA1n255VTgCyeUkwayW8idvwdwBuQ6Q8rEfEPwKtk4AZdz-QJTi46n/exec';
+const API_URL = 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE';
 // ════════════════════════════════════════════════════════════
 // How to get your URL:
 //   script.google.com → your project → Deploy → Manage deployments → copy URL
@@ -746,7 +746,7 @@ function switchTab(name){
   if(name==='live')       doRefresh().then(renderLive).catch(renderLive);
   if(name==='loyalty')    doRefresh().then(renderLoyalty).catch(renderLoyalty);
   if(name==='items')      doRefresh().then(renderItems).catch(renderItems);
-  if(name==='attendance') doRefresh().then(()=>{populateAttMonthFilter();renderAttendance();}).catch(()=>{populateAttMonthFilter();renderAttendance();});  // date range filter
+  if(name==='attendance') doRefresh().then(()=>{populateAttMonthFilter();renderAttendance();}).catch(()=>{populateAttMonthFilter();renderAttendance();});
 }
 
 // ══════════════════════════════════════════════════
@@ -1628,13 +1628,31 @@ function setAttRange(range){
 }
 
 function populateAttMonthFilter(){
-  // Set default range to current month on first load
+  // Called on tab open — set default range to current month if nothing set
+  setAttRange('month');
+}
+
+function setAttRange(preset){
   const fromEl = document.getElementById('attFrom');
   const toEl   = document.getElementById('attTo');
-  if(!fromEl.value){
-    fromEl.value = today().slice(0,7) + '-01';
+  const now    = new Date();
+
+  if(preset === 'week'){
+    // Mon–today of current week
+    const day = now.getDay(); // 0=Sun
+    const mon = new Date(now);
+    mon.setDate(now.getDate() - (day === 0 ? 6 : day - 1));
+    fromEl.value = mon.toISOString().slice(0,10);
+    toEl.value   = today();
+  } else if(preset === 'month'){
+    // 1st of current month → today
+    fromEl.value = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-01';
+    toEl.value   = today();
+  } else if(preset === 'all'){
+    fromEl.value = '';
     toEl.value   = today();
   }
+  renderAttendance();
 }
 
 // ── Render attendance records ──
