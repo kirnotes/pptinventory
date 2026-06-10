@@ -180,6 +180,25 @@ hr{border:none;border-top:1px solid var(--bdr);margin:11px 0;}
 ::-webkit-scrollbar{width:4px;height:4px;}
 ::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:var(--bdr2);border-radius:2px;}
+
+/* ATTENDANCE */
+.att-card{background:var(--sur2);border:1px solid var(--bdr2);border-radius:8px;padding:14px 15px;margin-bottom:10px;}
+.att-worker{font-family:'Syne',sans-serif;font-weight:800;font-size:15px;color:var(--txt);margin-bottom:3px;}
+.att-meta{font-size:11px;color:var(--mut);font-family:'DM Mono',monospace;}
+.att-chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
+.att-chip{background:var(--sur);border:1px solid var(--bdr);border-radius:5px;padding:6px 10px;font-size:11px;}
+.att-chip .lbl{font-size:9px;color:var(--mut);text-transform:uppercase;letter-spacing:.6px;margin-bottom:1px;}
+.att-chip .val{font-family:'DM Mono',monospace;font-weight:700;}
+.photo-box{width:100%;aspect-ratio:16/9;max-height:180px;background:var(--sur3);border:2px dashed var(--bdr2);border-radius:7px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;transition:border-color .15s;overflow:hidden;position:relative;}
+.photo-box:hover{border-color:var(--acc);}
+.photo-box img{width:100%;height:100%;object-fit:cover;border-radius:5px;}
+.photo-box .ph-lbl{font-size:11px;color:var(--mut);font-family:'DM Sans',sans-serif;}
+.photo-box .ph-ico{font-size:28px;}
+.photo-thumb{width:48px;height:48px;border-radius:4px;object-fit:cover;border:1px solid var(--bdr2);cursor:pointer;}
+input[type=file]{display:none;}
+.clock-form{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;align-items:end;}
+.night-badge{background:rgba(155,127,255,.15);color:var(--pur);border:1px solid rgba(155,127,255,.2);border-radius:4px;padding:3px 8px;font-size:10px;font-weight:700;font-family:'DM Mono',monospace;}
+.ot-badge{background:rgba(255,181,71,.15);color:var(--warn);border:1px solid rgba(255,181,71,.2);border-radius:4px;padding:3px 8px;font-size:10px;font-weight:700;font-family:'DM Mono',monospace;}
 </style>
 </head>
 <body>
@@ -201,6 +220,7 @@ hr{border:none;border-top:1px solid var(--bdr);margin:11px 0;}
     <button class="tnav-btn" onclick="switchTab('live')">🔴 Live</button>
     <button class="tnav-btn" onclick="switchTab('loyalty')">🎴 Loyalty</button>
     <button class="tnav-btn" onclick="switchTab('items')">🗂 Items</button>
+    <button class="tnav-btn" onclick="switchTab('attendance')">🕐 Attendance</button>
   </div>
   <div class="hdr-r">
     <div class="sync-pill"><div class="sync-dot" id="syncDot"></div><span id="syncTxt">—</span></div>
@@ -215,6 +235,7 @@ hr{border:none;border-top:1px solid var(--bdr);margin:11px 0;}
     <button class="bnav" id="bn-stock"  onclick="switchTab('stock')"><span class="ico">📦</span>Stock</button>
     <button class="bnav" id="bn-live"   onclick="switchTab('live')"><span class="ico">🔴</span>Live</button>
     <button class="bnav" id="bn-items"  onclick="switchTab('items')"><span class="ico">🗂</span>Items</button>
+    <button class="bnav" id="bn-attendance" onclick="switchTab('attendance')"><span class="ico">🕐</span>Attend.</button>
   </div>
 </div>
 
@@ -379,13 +400,10 @@ hr{border:none;border-top:1px solid var(--bdr);margin:11px 0;}
       <table>
         <thead><tr>
           <th>Item</th><th>Price</th>
-          <th style="color:var(--grn)">Start</th>
-          <th style="color:var(--grn)">IN</th>
-          <th style="color:var(--warn)">Sold</th>
-          <th style="color:var(--pur)">Comps</th>
-          <th style="color:var(--red)">OUT</th>
+          <th style="color:var(--grn)">Total IN</th>
+          <th style="color:var(--red)">Total OUT</th>
           <th>Remaining</th>
-          <th style="min-width:90px">Level</th>
+          <th style="min-width:100px">Stock Level</th>
         </tr></thead>
         <tbody id="liveBody"></tbody>
       </table>
@@ -446,6 +464,103 @@ hr{border:none;border-top:1px solid var(--bdr);margin:11px 0;}
   </div>
 </div>
 
+<!-- ═══ ATTENDANCE ═══ -->
+<div id="tab-attendance" class="tab-content">
+
+  <!-- Clock In/Out Form -->
+  <div class="card">
+    <div class="sec">Clock In / Clock Out</div>
+    <div class="clock-form">
+      <div>
+        <label>Worker Name</label>
+        <input type="text" id="attWorker" placeholder="Full name" style="text-transform:uppercase">
+      </div>
+      <div>
+        <label>Date</label>
+        <input type="date" id="attDate">
+      </div>
+      <div>
+        <label>Type</label>
+        <select id="attType">
+          <option value="IN">Clock IN</option>
+          <option value="OUT">Clock OUT</option>
+        </select>
+      </div>
+      <div>
+        <label>Time</label>
+        <input type="time" id="attTime">
+      </div>
+      <div>
+        <label>Overtime (mins)</label>
+        <input type="number" id="attOT" min="0" value="0" placeholder="0">
+      </div>
+    </div>
+
+    <!-- Photo upload -->
+    <div style="margin-top:12px">
+      <label style="margin-bottom:6px">Photo Proof (required)</label>
+      <div class="row" style="gap:12px;align-items:flex-start">
+        <div style="flex:1;min-width:180px">
+          <div class="photo-box" id="photoBox" onclick="document.getElementById('photoFile').click()">
+            <span class="ph-ico">📷</span>
+            <span class="ph-lbl">Tap to take photo or upload</span>
+          </div>
+          <input type="file" id="photoFile" accept="image/*" capture="environment" onchange="previewPhoto(this)">
+        </div>
+        <div style="flex:1;min-width:160px">
+          <div id="photoPreviewWrap" style="display:none">
+            <div style="font-size:10px;color:var(--acc);margin-bottom:4px;font-family:'DM Sans';font-weight:600">✅ Photo ready to upload</div>
+            <img id="photoPreview" style="width:100%;max-height:140px;object-fit:cover;border-radius:6px;border:1px solid var(--bdr2)">
+            <button class="btn btn-ghost btn-sm" onclick="clearPhoto()" style="margin-top:6px;width:100%">× Remove photo</button>
+          </div>
+          <div id="photoEmptyMsg" style="font-size:11px;color:var(--mut);padding:12px 0;font-family:'DM Sans'">
+            No photo selected yet.<br>A photo is required to clock in or out.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+      <button class="btn btn-acc" onclick="submitAttendance()" style="flex:1;min-width:150px">⏱ Submit Clock Record</button>
+      <button class="btn btn-ghost btn-sm" onclick="doRefresh().then(renderAttendance)">⟳ Refresh</button>
+    </div>
+    <div id="attNote" class="note" style="margin-top:10px"></div>
+  </div>
+
+  <!-- Filter & Summary -->
+  <div class="card">
+    <div class="sec">View Records</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:9px;align-items:flex-end;margin-bottom:10px">
+      <div>
+        <label>From Date</label>
+        <input type="date" id="attFrom" onchange="renderAttendance()">
+      </div>
+      <div>
+        <label>To Date</label>
+        <input type="date" id="attTo" onchange="renderAttendance()">
+      </div>
+      <div>
+        <label>Worker</label>
+        <input type="text" id="attSearch" placeholder="All workers" oninput="renderAttendance()">
+      </div>
+      <div style="display:flex;gap:7px;align-items:flex-end">
+        <button class="btn btn-acc btn-sm" onclick="setAttRange('week')" style="flex:1">Week</button>
+        <button class="btn btn-ghost btn-sm" onclick="setAttRange('month')" style="flex:1">Month</button>
+        <button class="btn btn-ghost btn-sm" onclick="setAttRange('all')" style="flex:1">All</button>
+      </div>
+    </div>
+
+    <!-- Period summary -->
+    <div id="attSummary" class="stats" style="margin-bottom:12px"></div>
+
+    <!-- Per-worker totals -->
+    <div id="attWorkerTotals" style="margin-bottom:14px"></div>
+
+    <!-- Day-by-day cards -->
+    <div id="attCards"></div>
+  </div>
+</div>
+
 </main>
 
 <!-- SHIFT DETAIL MODAL -->
@@ -465,7 +580,7 @@ hr{border:none;border-top:1px solid var(--bdr);margin:11px 0;}
 // ════════════════════════════════════════════════════════════
 //  ▼▼ PASTE YOUR GOOGLE APPS SCRIPT URL ON THE NEXT LINE ▼▼
 // ════════════════════════════════════════════════════════════
-const API_URL = 'https://script.google.com/macros/s/AKfycbybMwBsMRYFo6Mpxxg_uvgUL7dBb7exRjYeSPXDnC9GYZ1-GrPLOD6MLK--iyu1ROEg/exec';
+const API_URL = 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE';
 // ════════════════════════════════════════════════════════════
 // How to get your URL:
 //   script.google.com → your project → Deploy → Manage deployments → copy URL
@@ -520,14 +635,15 @@ async function doRefresh(){
   setSyncState('busy','Syncing…');
   try {
     const d = await api('getAll');
-    products = d.products||[];
+    products    = d.products||[];
     if(!products.length) products=[...DEFAULT_PRODUCTS];
-    salesLog = (d.shifts||[]).sort(shiftSort);
-    stockMov = d.stock||[];
-    loyCards = d.loyalty||[];
+    salesLog    = (d.shifts||[]).sort(shiftSort);
+    stockMov    = d.stock||[];
+    loyCards    = d.loyalty||[];
+    attRecords  = d.attendance||[];
     setSyncState('ok','Synced');
     // Cache locally for offline fallback
-    localStorage.setItem('tpp_cache', JSON.stringify({products,salesLog,stockMov,loyCards,ts:Date.now()}));
+    localStorage.setItem('tpp_cache', JSON.stringify({products,salesLog,stockMov,loyCards,attRecords,ts:Date.now()}));
     return true;
   } catch(e) {
     setSyncState('err','Error');
@@ -535,7 +651,7 @@ async function doRefresh(){
     const c=localStorage.getItem('tpp_cache');
     if(c){
       const d=JSON.parse(c);
-      products=d.products||[];salesLog=d.salesLog||[];stockMov=d.stockMov||[];loyCards=d.loyCards||[];
+      products=d.products||[];salesLog=d.salesLog||[];stockMov=d.stockMov||[];loyCards=d.loyCards||[];attRecords=d.attRecords||[];
     }
     throw e;
   }
@@ -564,6 +680,13 @@ async function startApp(){
 
 function initApp(){
   document.getElementById('stDate').value=today();
+  document.getElementById('attDate').value=today();
+  // Set current time for attendance
+  const now = new Date();
+  const hh  = String(now.getHours()).padStart(2,'0');
+  const mm  = String(now.getMinutes()).padStart(2,'0');
+  document.getElementById('attTime').value = hh+':'+mm;
+  if(currentUser) document.getElementById('attWorker').value=currentUser;
   if(currentUser){
     document.getElementById('usrBtn').textContent='👤 '+currentUser;
     document.getElementById('posWorker').value=currentUser;
@@ -610,7 +733,7 @@ function promptUser(){
 // ══════════════════════════════════════════════════
 //  TABS
 // ══════════════════════════════════════════════════
-const TABS=['daily','logs','stock','live','loyalty','items'];
+const TABS=['daily','logs','stock','live','loyalty','items','attendance'];
 function switchTab(name){
   TABS.forEach(t=>document.getElementById('tab-'+t).classList.toggle('active',t===name));
   document.querySelectorAll('.tnav-btn').forEach((b,i)=>b.classList.toggle('active',TABS[i]===name));
@@ -618,11 +741,12 @@ function switchTab(name){
     const b=document.getElementById('bn-'+t);
     if(b)b.classList.toggle('active',t===name);
   });
-  if(name==='logs')    doRefresh().then(()=>{populateYearFilter();renderYearOverview();renderLogs();}).catch(()=>{populateYearFilter();renderYearOverview();renderLogs();});
-  if(name==='stock')   doRefresh().then(()=>{renderStockTable();syncStockSelect();}).catch(()=>{renderStockTable();syncStockSelect();});
-  if(name==='live')    doRefresh().then(renderLive).catch(renderLive);
-  if(name==='loyalty') doRefresh().then(renderLoyalty).catch(renderLoyalty);
-  if(name==='items')   doRefresh().then(renderItems).catch(renderItems);
+  if(name==='logs')       doRefresh().then(()=>{populateYearFilter();renderYearOverview();renderLogs();}).catch(()=>{populateYearFilter();renderYearOverview();renderLogs();});
+  if(name==='stock')      doRefresh().then(()=>{renderStockTable();syncStockSelect();}).catch(()=>{renderStockTable();syncStockSelect();});
+  if(name==='live')       doRefresh().then(renderLive).catch(renderLive);
+  if(name==='loyalty')    doRefresh().then(renderLoyalty).catch(renderLoyalty);
+  if(name==='items')      doRefresh().then(renderItems).catch(renderItems);
+  if(name==='attendance') doRefresh().then(()=>{populateAttMonthFilter();renderAttendance();}).catch(()=>{populateAttMonthFilter();renderAttendance();});  // date range filter
 }
 
 // ══════════════════════════════════════════════════
@@ -1241,36 +1365,40 @@ async function delStock(id){
 //  LIVE INVENTORY
 // ══════════════════════════════════════════════════
 function renderLive(){
-  const q =document.getElementById('liveSearch')?.value.toLowerCase()||'';
-  const ls=q?products.filter(p=>p.name.toLowerCase().includes(q)):products;
-  const tb=document.getElementById('liveBody');
-  tb.innerHTML='';
-  ls.forEach(p=>{
-    const logs    =stockMov.filter(e=>e.item===p.name);
-    const totalIn =logs.filter(e=>e.action==='IN').reduce((s,e)=>s+e.qty,0);
-    const stockOut=logs.filter(e=>e.action==='OUT').reduce((s,e)=>s+e.qty,0);
-    let sold=0,comps=0;
-    salesLog.forEach(sh=>{const r=(sh.rows||[]).find(r=>r.name===p.name);if(r){sold+=(r.sold||0);comps+=(r.comps||0);}});
-    let startStock=0;
-    if(salesLog.length){const fr=(salesLog[0].rows||[]).find(r=>r.name===p.name);if(fr)startStock=fr.start||0;}
-    const remaining=startStock+totalIn-sold-comps-stockOut;
-    const denom=startStock+totalIn;
-    const pct=denom>0?Math.max(0,Math.min(100,(remaining/denom)*100)):0;
-    const cls=pct<20?'low':pct<50?'mid':'';
-    tb.innerHTML+=`<tr>
-      <td class="tl">${p.name}</td><td class="ta">${fmt(p.price)}</td>
-      <td style="color:var(--grn)">${startStock}</td>
-      <td style="color:var(--grn)">${totalIn}</td>
-      <td style="color:var(--warn)">${sold}</td>
-      <td style="color:var(--pur)">${comps}</td>
-      <td style="color:var(--red)">${stockOut}</td>
-      <td class="${remaining<0?'tn':remaining===0?'td':'tp'}">${remaining}</td>
-      <td><div class="prg">
-        <div class="prg-t"><div class="prg-f ${cls}" style="width:${pct}%"></div></div>
-        <span style="font-size:9px;color:var(--mut);min-width:26px">${Math.round(pct)}%</span>
-      </div></td>
+  const q  = document.getElementById('liveSearch')?.value.toLowerCase()||'';
+  const ls = q ? products.filter(p=>p.name.toLowerCase().includes(q)) : products;
+  const tb = document.getElementById('liveBody');
+  tb.innerHTML = '';
+
+  ls.forEach(p => {
+    // ── ONLY uses stockMov — completely independent from POS/shifts ──
+    const logs     = stockMov.filter(e => e.item === p.name);
+    const totalIn  = logs.filter(e => e.action === 'IN').reduce((s,e) => s + (Number(e.qty)||0), 0);
+    const totalOut = logs.filter(e => e.action === 'OUT').reduce((s,e) => s + (Number(e.qty)||0), 0);
+    const remaining = totalIn - totalOut;
+
+    // Stock level % based on total IN as the baseline
+    const pct = totalIn > 0 ? Math.max(0, Math.min(100, (remaining / totalIn) * 100)) : 0;
+    const cls = pct < 20 ? 'low' : pct < 50 ? 'mid' : '';
+
+    tb.innerHTML += `<tr>
+      <td class="tl">${p.name}</td>
+      <td class="ta">${fmt(p.price)}</td>
+      <td style="color:var(--grn);font-weight:600">${totalIn}</td>
+      <td style="color:var(--red)">${totalOut}</td>
+      <td class="${remaining < 0 ? 'tn' : remaining === 0 ? 'td' : 'tp'}" style="font-weight:600">${remaining}</td>
+      <td>
+        <div class="prg">
+          <div class="prg-t"><div class="prg-f ${cls}" style="width:${pct}%"></div></div>
+          <span style="font-size:9px;color:var(--mut);min-width:28px">${Math.round(pct)}%</span>
+        </div>
+      </td>
     </tr>`;
   });
+
+  if(ls.length === 0){
+    tb.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--mut);padding:24px">No items found.</td></tr>';
+  }
 }
 
 // ══════════════════════════════════════════════════
@@ -1377,6 +1505,353 @@ async function delItem(name){
     renderItems();renderPOS();syncStockSelect();
     toast('Removed.');
   }catch(e){toast('⚠ '+e.message,'err');}
+}
+
+// ══════════════════════════════════════════════════
+//  ATTENDANCE
+// ══════════════════════════════════════════════════
+let attRecords = [];  // loaded from server
+let photoB64   = '';  // base64 of selected photo
+let photoMime  = '';  // mime type of photo
+
+// ── Photo preview ──
+function previewPhoto(input){
+  const file = input.files[0];
+  if(!file) return;
+  // Compress before storing
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = new Image();
+    img.onload = () => {
+      // Resize to max 800px wide to keep size manageable
+      const MAX = 800;
+      let w = img.width, h = img.height;
+      if(w > MAX){ h = Math.round(h * MAX / w); w = MAX; }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      photoB64  = canvas.toDataURL('image/jpeg', 0.7).split(',')[1];
+      photoMime = 'image/jpeg';
+      // Show preview
+      document.getElementById('photoPreview').src = 'data:image/jpeg;base64,' + photoB64;
+      document.getElementById('photoPreviewWrap').style.display = 'block';
+      document.getElementById('photoEmptyMsg').style.display    = 'none';
+      document.getElementById('photoBox').innerHTML =
+        '<img src="data:image/jpeg;base64,' + photoB64 + '" style="width:100%;height:100%;object-fit:cover;border-radius:5px">';
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearPhoto(){
+  photoB64 = ''; photoMime = '';
+  document.getElementById('photoFile').value = '';
+  document.getElementById('photoPreviewWrap').style.display = 'none';
+  document.getElementById('photoEmptyMsg').style.display    = 'block';
+  document.getElementById('photoBox').innerHTML =
+    '<span class="ph-ico">📷</span><span class="ph-lbl">Tap to take photo or upload</span>';
+}
+
+// ── Submit clock record ──
+async function submitAttendance(){
+  const worker = (document.getElementById('attWorker').value||'').toUpperCase().trim();
+  const date   = document.getElementById('attDate').value;
+  const type   = document.getElementById('attType').value;
+  const time   = document.getElementById('attTime').value;
+  const ot     = parseInt(document.getElementById('attOT').value)||0;
+
+  if(!worker){ showAttNote('⚠ Enter worker name','warn'); return; }
+  if(!date)  { showAttNote('⚠ Pick a date','warn'); return; }
+  if(!time)  { showAttNote('⚠ Enter time','warn'); return; }
+  if(!photoB64){ showAttNote('⚠ Photo is required — tap the camera box','warn'); return; }
+
+  showAttNote('⏳ Uploading photo and saving…','info');
+
+  const record = {
+    id:     `${date}_${worker.replace(/\s+/g,'_')}_${type}_${Date.now()}`,
+    worker, date, type, time, ot,
+    savedAt: Date.now()
+  };
+
+  try{
+    // Upload photo first, get back a URL
+    const photoResp = await api('savePhoto', {
+      base64: photoB64,
+      mime:   photoMime,
+      name:   `${date}_${worker}_${type}_${Date.now()}.jpg`
+    });
+    record.photoUrl = photoResp.url || '';
+
+    // Save the attendance record
+    await api('saveAttendance', record);
+
+    // Update local state
+    attRecords.push(record);
+
+    showAttNote(`✅ ${type === 'IN' ? 'Clocked IN' : 'Clocked OUT'} — ${worker} at ${time} on ${date}`, 'ok');
+    clearPhoto();
+    document.getElementById('attOT').value = 0;
+    renderAttendance();
+    toast(`✅ ${worker} clocked ${type}`);
+  } catch(e){
+    showAttNote('⚠ Failed: ' + e.message, 'warn');
+    toast('⚠ ' + e.message, 'err');
+  }
+}
+
+function showAttNote(msg, type){
+  const n = document.getElementById('attNote');
+  n.textContent = msg; n.className = 'note ' + type; n.style.display = 'block';
+}
+
+// ── Month filter ──
+// ── Quick range setters ──
+function setAttRange(range){
+  const t = today();
+  let from, to = t;
+  if(range === 'week'){
+    const d = new Date(t);
+    d.setDate(d.getDate() - 6);
+    from = d.toISOString().slice(0,10);
+  } else if(range === 'month'){
+    from = t.slice(0,7) + '-01';
+  } else {
+    // all — use earliest record date or start of year
+    const dates = attRecords.map(r=>r.date).sort();
+    from = dates.length ? dates[0] : t.slice(0,4)+'-01-01';
+    to   = t;
+  }
+  document.getElementById('attFrom').value = from;
+  document.getElementById('attTo').value   = to;
+  renderAttendance();
+}
+
+function populateAttMonthFilter(){
+  // Set default range to current month on first load
+  const fromEl = document.getElementById('attFrom');
+  const toEl   = document.getElementById('attTo');
+  if(!fromEl.value){
+    fromEl.value = today().slice(0,7) + '-01';
+    toEl.value   = today();
+  }
+}
+
+// ── Render attendance records ──
+function renderAttendance(){
+  const from = document.getElementById('attFrom')?.value || '';
+  const to   = document.getElementById('attTo')?.value   || today();
+  const q    = (document.getElementById('attSearch')?.value||'').toLowerCase();
+
+  // Filter by date range
+  let recs = attRecords.filter(r => {
+    if(from && r.date < from) return false;
+    if(r.date > to)           return false;
+    return true;
+  });
+  if(q) recs = recs.filter(r => r.worker.toLowerCase().includes(q));
+
+  // ── Build per-worker per-date pairs ──
+  const groups = {};
+  recs.forEach(r => {
+    const key = r.worker + '|' + r.date;
+    if(!groups[key]) groups[key] = { worker:r.worker, date:r.date, inRec:null, outRec:null };
+    if(r.type === 'IN')  groups[key].inRec  = r;
+    if(r.type === 'OUT') groups[key].outRec = r;
+  });
+
+  const pairs = Object.values(groups).sort((a,b) => a.date < b.date ? 1 : -1);
+
+  // ── Overall totals for the period ──
+  let totalHours=0, totalND=0, totalOT=0, totalDays=0;
+  pairs.forEach(p => {
+    const c = calcHours(p);
+    totalHours += c.regular;
+    totalND    += c.nightDif;
+    totalOT    += c.ot;
+    if(c.regular > 0 || c.ot > 0) totalDays++;
+  });
+
+  const rangeLabel = from ? `${from} → ${to}` : `Up to ${to}`;
+  document.getElementById('attSummary').innerHTML = [
+    {l:'Period',        v:rangeLabel,         c:'var(--txt)',  fs:'12px'},
+    {l:'Days Worked',   v:totalDays,          c:'var(--txt)'},
+    {l:'Total Hours',   v:fmtHrs(totalHours), c:'var(--acc)'},
+    {l:'Night Diff',    v:fmtHrs(totalND),    c:'var(--pur)'},
+    {l:'Overtime',      v:fmtHrs(totalOT),    c:'var(--warn)'},
+    {l:'Records',       v:recs.length,        c:'var(--mut2)'},
+  ].map(x=>`<div class="stat"><div class="lbl">${x.l}</div>
+    <div class="val" style="color:${x.c};font-size:${x.fs||'16px'}">${x.v}</div>
+  </div>`).join('');
+
+  // ── Per-worker totals table ──
+  const workerMap = {};
+  pairs.forEach(p => {
+    if(!workerMap[p.worker]) workerMap[p.worker] = {days:0,hours:0,nd:0,ot:0};
+    const c = calcHours(p);
+    workerMap[p.worker].hours += c.regular;
+    workerMap[p.worker].nd    += c.nightDif;
+    workerMap[p.worker].ot    += c.ot;
+    if(c.regular > 0 || c.ot > 0) workerMap[p.worker].days++;
+  });
+
+  const workers = Object.entries(workerMap).sort((a,b)=>a[0]>b[0]?1:-1);
+  const wtEl = document.getElementById('attWorkerTotals');
+
+  if(workers.length > 1){
+    wtEl.innerHTML = `
+      <div class="sec" style="margin-bottom:8px">Worker Totals</div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr>
+            <th>Worker</th>
+            <th>Days</th>
+            <th style="color:var(--acc)">Regular Hrs</th>
+            <th style="color:var(--pur)">Night Diff</th>
+            <th style="color:var(--warn)">Overtime</th>
+            <th style="color:var(--txt)">Total Hrs</th>
+          </tr></thead>
+          <tbody>${workers.map(([name,w])=>`<tr>
+            <td class="tl">${name}</td>
+            <td>${w.days}</td>
+            <td style="color:var(--acc);font-weight:700">${fmtHrs(w.hours)}</td>
+            <td style="color:var(--pur)">${fmtHrs(w.nd)}</td>
+            <td style="color:var(--warn)">${fmtHrs(w.ot)}</td>
+            <td style="font-weight:700">${fmtHrs(w.hours+w.ot)}</td>
+          </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>`;
+  } else {
+    wtEl.innerHTML = '';
+  }
+
+  // ── Day-by-day cards ──
+  const container = document.getElementById('attCards');
+  if(!pairs.length){
+    container.innerHTML = `<div style="text-align:center;color:var(--mut);padding:28px;font-family:'DM Sans'">
+      No records found for this period.</div>`;
+    return;
+  }
+
+  container.innerHTML = `<div class="sec" style="margin-bottom:8px">Daily Records</div>` +
+    pairs.map(p => {
+    const calc   = calcHours(p);
+    const inRec  = p.inRec;
+    const outRec = p.outRec;
+    const hasOT  = calc.ot > 0;
+    const hasND  = calc.nightDif > 0;
+    return `<div class="att-card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:6px">
+        <div>
+          <div class="att-worker">${p.worker}</div>
+          <div class="att-meta">${p.date}
+            ${hasND ? '<span class="night-badge" style="margin-left:6px">🌙 Night Diff</span>' : ''}
+            ${hasOT ? '<span class="ot-badge" style="margin-left:4px">⚡ OT</span>' : ''}
+          </div>
+        </div>
+        <button class="btn btn-red btn-sm" onclick="deleteAttPair('${p.worker}','${p.date}')">× Delete</button>
+      </div>
+      <div class="att-chips">
+        <div class="att-chip">
+          <div class="lbl">Clock IN</div>
+          <div class="val" style="color:var(--acc)">${inRec ? inRec.time : '—'}</div>
+          ${inRec?.photoUrl
+            ? `<div style="margin-top:5px"><img src="${inRec.photoUrl}" class="photo-thumb"
+                onclick="window.open('${inRec.photoUrl}','_blank')" title="View photo"></div>`
+            : '<div style="font-size:9px;color:var(--mut);margin-top:3px">No photo</div>'}
+        </div>
+        <div class="att-chip">
+          <div class="lbl">Clock OUT</div>
+          <div class="val" style="color:var(--red)">${outRec ? outRec.time : '—'}</div>
+          ${outRec?.photoUrl
+            ? `<div style="margin-top:5px"><img src="${outRec.photoUrl}" class="photo-thumb"
+                onclick="window.open('${outRec.photoUrl}','_blank')" title="View photo"></div>`
+            : '<div style="font-size:9px;color:var(--mut);margin-top:3px">No photo</div>'}
+        </div>
+        <div class="att-chip">
+          <div class="lbl">Regular Hrs</div>
+          <div class="val" style="color:var(--txt)">${fmtHrs(calc.regular)}</div>
+        </div>
+        <div class="att-chip">
+          <div class="lbl">Total Hrs</div>
+          <div class="val" style="color:var(--acc)">${fmtHrs(calc.regular + calc.ot)}</div>
+        </div>
+        ${hasND ? `<div class="att-chip">
+          <div class="lbl">Night Diff</div>
+          <div class="val" style="color:var(--pur)">${fmtHrs(calc.nightDif)}</div>
+          <div style="font-size:9px;color:var(--mut);margin-top:2px">Past 8PM</div>
+        </div>` : ''}
+        ${hasOT ? `<div class="att-chip">
+          <div class="lbl">Overtime</div>
+          <div class="val" style="color:var(--warn)">${fmtHrs(calc.ot)}</div>
+          <div style="font-size:9px;color:var(--mut);margin-top:2px">${(outRec||inRec)?.ot||0} mins</div>
+        </div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── Calculate hours from a clock-in/out pair ──
+function calcHours(pair){
+  const inRec  = pair.inRec;
+  const outRec = pair.outRec;
+  let regular  = 0;
+  let nightDif = 0;
+  let ot       = 0;
+
+  // OT from clock-out record (or clock-in if only that)
+  const otMins = Number((outRec||inRec)?.ot)||0;
+  ot = otMins / 60;
+
+  if(!inRec || !outRec) return { regular, nightDif, ot };
+
+  // Parse times
+  const [inH,  inM]  = inRec.time.split(':').map(Number);
+  const [outH, outM] = outRec.time.split(':').map(Number);
+
+  // Total minutes worked
+  let totalMins = (outH * 60 + outM) - (inH * 60 + inM);
+  if(totalMins < 0) totalMins += 24 * 60; // crosses midnight
+  regular = totalMins / 60;
+
+  // Night differential: hours between 8PM (20:00) and 6AM (06:00)
+  // Count minutes in the night diff window
+  let ndMins = 0;
+  const NIGHT_START = 20 * 60; // 8PM in minutes
+  const NIGHT_END   = 6 * 60;  // 6AM next day in minutes (= 30*60 in 30h clock)
+
+  // Walk through each minute of work and check if it's in night hours
+  const startMin = inH  * 60 + inM;
+  const endMin   = startMin + totalMins;
+
+  for(let m = startMin; m < endMin; m++){
+    const mMod = m % (24 * 60); // normalize to 0-1440
+    if(mMod >= NIGHT_START || mMod < NIGHT_END) ndMins++;
+  }
+  nightDif = ndMins / 60;
+
+  return { regular: Math.round(regular * 100)/100, nightDif: Math.round(nightDif * 100)/100, ot: Math.round(ot * 100)/100 };
+}
+
+function fmtHrs(h){
+  if(!h) return '0h 0m';
+  const hrs  = Math.floor(h);
+  const mins = Math.round((h - hrs) * 60);
+  return `${hrs}h ${mins}m`;
+}
+
+async function deleteAttPair(worker, date){
+  if(!confirm(`Delete all clock records for ${worker} on ${date}?`)) return;
+  const toDelete = attRecords.filter(r => r.worker === worker && r.date === date);
+  try{
+    for(const r of toDelete){
+      await api('deleteAttendance', {id: r.id});
+    }
+    attRecords = attRecords.filter(r => !(r.worker === worker && r.date === date));
+    renderAttendance();
+    toast('Records deleted.');
+  }catch(e){ toast('⚠ ' + e.message, 'err'); }
 }
 
 // ══════════════════════════════════════════════════
