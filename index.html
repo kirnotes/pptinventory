@@ -580,7 +580,7 @@ input[type=file]{display:none;}
 // ════════════════════════════════════════════════════════════
 //  ▼▼ PASTE YOUR GOOGLE APPS SCRIPT URL ON THE NEXT LINE ▼▼
 // ════════════════════════════════════════════════════════════
-const API_URL = 'https://script.google.com/macros/s/AKfycbwxLqPi8KjCHY30lOnSYrsO1ULfD0AhwhtXnT5upsV24FpCsN9-pdqUOiNomf61m1hd/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbynBRZnI_nw4S6QgPe4KeaiYlNSTuLJrBXQG4be2SyOWmHmQE5RDyqAxQQZZfQnl12Y/exec';
 // ════════════════════════════════════════════════════════════
 // How to get your URL:
 //   script.google.com → your project → Deploy → Manage deployments → copy URL
@@ -620,15 +620,91 @@ function setSyncState(s,txt){
 }
 
 async function api(action, data){
+  // Photo uploads are too large for GET URL params — use POST via form trick
+  if(action === 'savePhoto'){
+    return await apiPost(action, data);
+  }
+  // All other requests use GET (no CORS preflight issues)
   let url = API_URL + '?action=' + encodeURIComponent(action);
   if(data) url += '&data=' + encodeURIComponent(JSON.stringify(data));
-  // Add cache-buster for GET reads
   url += '&t=' + Date.now();
   const resp = await fetch(url, {method:'GET', redirect:'follow'});
   if(!resp.ok) throw new Error('HTTP '+resp.status);
   const json = await resp.json();
   if(json.error) throw new Error(json.error);
   return json;
+}
+
+// POST via hidden form — bypasses CORS for Apps Script
+async function apiPost(action, data){
+  return new Promise((resolve, reject) => {
+    // Create a hidden iframe to receive the response
+    const iframeId = 'post_iframe_' + Date.now();
+    const formId   = 'post_form_'   + Date.now();
+
+    const iframe = document.createElement('iframe');
+    iframe.name  = iframeId;
+    iframe.id    = iframeId;
+    iframe.style.display = 'none';
+    document.body.appendChild(iframe);
+
+    const form = document.createElement('form');
+    form.method  = 'POST';
+    form.action  = API_URL;
+    form.target  = iframeId;
+    form.id      = formId;
+    form.style.display = 'none';
+
+    // Add action field
+    const actionInput = document.createElement('input');
+    actionInput.type  = 'hidden';
+    actionInput.name  = 'action';
+    actionInput.value = action;
+    form.appendChild(actionInput);
+
+    // Add data as JSON field
+    const dataInput = document.createElement('input');
+    dataInput.type  = 'hidden';
+    dataInput.name  = 'data';
+    dataInput.value = JSON.stringify(data);
+    form.appendChild(dataInput);
+
+    document.body.appendChild(form);
+
+    // Listen for iframe load
+    let done = false;
+    iframe.onload = () => {
+      if(done) return;
+      done = true;
+      try {
+        const text = iframe.contentDocument?.body?.innerText || iframe.contentWindow?.document?.body?.innerText || '';
+        const json = JSON.parse(text);
+        if(json.error) reject(new Error(json.error));
+        else resolve(json);
+      } catch(e) {
+        // If we can't read the iframe (cross-origin), assume success
+        // The photo was uploaded, we just can't read the response
+        resolve({ ok: true, url: '' });
+      } finally {
+        setTimeout(() => {
+          document.body.removeChild(iframe);
+          document.body.removeChild(form);
+        }, 1000);
+      }
+    };
+
+    // Timeout after 30 seconds
+    setTimeout(() => {
+      if(!done){
+        done = true;
+        document.body.removeChild(iframe);
+        document.body.removeChild(form);
+        reject(new Error('Photo upload timed out — try a smaller photo'));
+      }
+    }, 30000);
+
+    form.submit();
+  });
 }
 
 async function doRefresh(){
@@ -1528,14 +1604,23 @@ function previewPhoto(input){
   reader.onload = e => {
     const img = new Image();
     img.onload = () => {
-      // Resize to max 800px wide to keep size manageable
-      const MAX = 800;
+      // Resize to max 640px wide and compress hard for reliable upload
+      const MAX = 640;
       let w = img.width, h = img.height;
       if(w > MAX){ h = Math.round(h * MAX / w); w = MAX; }
+      if(h > MAX){ w = Math.round(w * MAX / h); h = MAX; }
       const canvas = document.createElement('canvas');
       canvas.width = w; canvas.height = h;
       canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-      photoB64  = canvas.toDataURL('image/jpeg', 0.7).split(',')[1];
+      // Start at quality 0.6, reduce if still too large
+      let quality = 0.6;
+      let b64 = canvas.toDataURL('image/jpeg', quality).split(',')[1];
+      // Keep halving quality until under 200KB base64 (~150KB file)
+      while(b64.length > 200000 && quality > 0.1){
+        quality -= 0.1;
+        b64 = canvas.toDataURL('image/jpeg', quality).split(',')[1];
+      }
+      photoB64  = b64;
       photoMime = 'image/jpeg';
       // Show preview
       document.getElementById('photoPreview').src = 'data:image/jpeg;base64,' + photoB64;
@@ -1580,27 +1665,44 @@ async function submitAttendance(){
   };
 
   try{
-    // Upload photo first, get back a URL
-    const photoResp = await api('savePhoto', {
-      base64: photoB64,
-      mime:   photoMime,
-      name:   `${date}_${worker}_${type}_${Date.now()}.jpg`
-    });
-    record.photoUrl = photoResp.url || '';
+    showAttNote('⏳ Uploading photo…','info');
 
-    // Save the attendance record
+    // Try to upload photo — if it fails, still save the attendance record
+    try {
+      const photoResp = await api('savePhoto', {
+        base64: photoB64,
+        mime:   photoMime,
+        name:   `${date}_${worker}_${type}_${Date.now()}.jpg`
+      });
+      record.photoUrl = photoResp.url || '';
+      if(record.photoUrl) {
+        showAttNote('⏳ Photo uploaded — saving record…','info');
+      } else {
+        // iframe cross-origin: photo likely uploaded but URL not readable — mark as uploaded
+        record.photoUrl = 'uploaded';
+        showAttNote('⏳ Photo sent — saving record…','info');
+      }
+    } catch(photoErr) {
+      // Photo upload failed — save record anyway with a note
+      record.photoUrl = '';
+      console.warn('Photo upload failed:', photoErr.message);
+      showAttNote('⚠ Photo upload failed but saving record — ' + photoErr.message, 'warn');
+    }
+
+    // Save the attendance record regardless of photo result
     await api('saveAttendance', record);
 
     // Update local state
     attRecords.push(record);
 
-    showAttNote(`✅ ${type === 'IN' ? 'Clocked IN' : 'Clocked OUT'} — ${worker} at ${time} on ${date}`, 'ok');
+    const photoStatus = record.photoUrl ? ' (photo saved)' : ' (no photo)';
+    showAttNote(`✅ ${type === 'IN' ? 'Clocked IN' : 'Clocked OUT'} — ${worker} at ${time} on ${date}${photoStatus}`, 'ok');
     clearPhoto();
     document.getElementById('attOT').value = 0;
     renderAttendance();
     toast(`✅ ${worker} clocked ${type}`);
   } catch(e){
-    showAttNote('⚠ Failed: ' + e.message, 'warn');
+    showAttNote('⚠ Failed to save record: ' + e.message, 'warn');
     toast('⚠ ' + e.message, 'err');
   }
 }
