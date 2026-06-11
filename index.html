@@ -580,7 +580,7 @@ input[type=file]{display:none;}
 // ════════════════════════════════════════════════════════════
 //  ▼▼ PASTE YOUR GOOGLE APPS SCRIPT URL ON THE NEXT LINE ▼▼
 // ════════════════════════════════════════════════════════════
-const API_URL = 'https://script.google.com/macros/s/AKfycbx9kPaPZxBA7fIA1n255VTgCyeUkwayW8idvwdwBuQ6Q8rEfEPwKtk4AZdz-QJTi46n/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbwxLqPi8KjCHY30lOnSYrsO1ULfD0AhwhtXnT5upsV24FpCsN9-pdqUOiNomf61m1hd/exec';
 // ════════════════════════════════════════════════════════════
 // How to get your URL:
 //   script.google.com → your project → Deploy → Manage deployments → copy URL
@@ -635,12 +635,12 @@ async function doRefresh(){
   setSyncState('busy','Syncing…');
   try {
     const d = await api('getAll');
-    products    = d.products||[];
-    if(!products.length) products=[...DEFAULT_PRODUCTS];
-    salesLog    = (d.shifts||[]).sort(shiftSort);
-    stockMov    = d.stock||[];
-    loyCards    = d.loyalty||[];
-    attRecords  = d.attendance||[];
+    products    = Array.isArray(d.products)   ? d.products   : [];
+    salesLog    = Array.isArray(d.shifts)      ? d.shifts.sort(shiftSort) : [];
+    stockMov    = Array.isArray(d.stock)       ? d.stock      : [];
+    loyCards    = Array.isArray(d.loyalty)     ? d.loyalty    : [];
+    attRecords  = Array.isArray(d.attendance)  ? d.attendance : [];
+    if(!products.length) products = [...DEFAULT_PRODUCTS];
     setSyncState('ok','Synced');
     // Cache locally for offline fallback
     localStorage.setItem('tpp_cache', JSON.stringify({products,salesLog,stockMov,loyCards,attRecords,ts:Date.now()}));
@@ -746,7 +746,7 @@ function switchTab(name){
   if(name==='live')       doRefresh().then(renderLive).catch(renderLive);
   if(name==='loyalty')    doRefresh().then(renderLoyalty).catch(renderLoyalty);
   if(name==='items')      doRefresh().then(renderItems).catch(renderItems);
-  if(name==='attendance') doRefresh().then(()=>{populateAttMonthFilter();renderAttendance();}).catch(()=>{populateAttMonthFilter();renderAttendance();});
+  if(name==='attendance') doRefresh().then(()=>{setAttRange('month');}).catch(()=>{setAttRange('month');});
 }
 
 // ══════════════════════════════════════════════════
@@ -997,6 +997,7 @@ function addGcash(){gcashEntries.push(0);renderGcashUI();}
 // Update a single row value without re-rendering the whole table
 // Then recalculate just that row's End, Next, Income display
 function updateRow(i, field, val){
+  if(!posRows[i]) return; // guard against stale index after re-render
   posRows[i][field] = parseFloat(val)||0;
   // Recalculate End, Next, Income for this row only
   const r    = posRows[i];
@@ -1340,8 +1341,9 @@ async function addStock(){
 
 function renderStockTable(){
   const q  =(document.getElementById('stSearch')?.value||'').toLowerCase();
-  const all=[...stockMov].reverse();
-  const lst=q?all.filter(e=>e.item.toLowerCase().includes(q)||e.date.includes(q)||(e.takenBy||'').toLowerCase().includes(q)):all;
+  const safe=Array.isArray(stockMov)?stockMov:[];
+  const all=[...safe].reverse();
+  const lst=q?all.filter(e=>e&&e.item&&(e.item.toLowerCase().includes(q)||e.date.includes(q)||(e.takenBy||'').toLowerCase().includes(q))):all;
   const tb =document.getElementById('stBody');
   if(!lst.length){tb.innerHTML=`<tr><td colspan="8" style="text-align:center;color:var(--mut);padding:22px">No transactions yet.</td></tr>`;return;}
   tb.innerHTML=lst.map((e,i)=>`<tr>
@@ -1368,13 +1370,16 @@ function renderLive(){
   const q  = document.getElementById('liveSearch')?.value.toLowerCase()||'';
   const ls = q ? products.filter(p=>p.name.toLowerCase().includes(q)) : products;
   const tb = document.getElementById('liveBody');
+  if(!tb) return;
   tb.innerHTML = '';
+  // Ensure stockMov is always an array — NEVER reads from salesLog
+  const safeStock = Array.isArray(stockMov) ? stockMov : [];
 
   ls.forEach(p => {
     // ── ONLY uses stockMov — completely independent from POS/shifts ──
-    const logs     = stockMov.filter(e => e.item === p.name);
-    const totalIn  = logs.filter(e => e.action === 'IN').reduce((s,e) => s + (Number(e.qty)||0), 0);
-    const totalOut = logs.filter(e => e.action === 'OUT').reduce((s,e) => s + (Number(e.qty)||0), 0);
+    const logs     = safeStock.filter(e => e && e.item === p.name);
+    const totalIn  = logs.filter(e => e && e.action === 'IN').reduce((s,e) => s + (Number(e.qty)||0), 0);
+    const totalOut = logs.filter(e => e && e.action === 'OUT').reduce((s,e) => s + (Number(e.qty)||0), 0);
     const remaining = totalIn - totalOut;
 
     // Stock level % based on total IN as the baseline
@@ -1605,33 +1610,7 @@ function showAttNote(msg, type){
   n.textContent = msg; n.className = 'note ' + type; n.style.display = 'block';
 }
 
-// ── Month filter ──
 // ── Quick range setters ──
-function setAttRange(range){
-  const t = today();
-  let from, to = t;
-  if(range === 'week'){
-    const d = new Date(t);
-    d.setDate(d.getDate() - 6);
-    from = d.toISOString().slice(0,10);
-  } else if(range === 'month'){
-    from = t.slice(0,7) + '-01';
-  } else {
-    // all — use earliest record date or start of year
-    const dates = attRecords.map(r=>r.date).sort();
-    from = dates.length ? dates[0] : t.slice(0,4)+'-01-01';
-    to   = t;
-  }
-  document.getElementById('attFrom').value = from;
-  document.getElementById('attTo').value   = to;
-  renderAttendance();
-}
-
-function populateAttMonthFilter(){
-  // Called on tab open — set default range to current month if nothing set
-  setAttRange('month');
-}
-
 function setAttRange(preset){
   const fromEl = document.getElementById('attFrom');
   const toEl   = document.getElementById('attTo');
@@ -1812,44 +1791,53 @@ function renderAttendance(){
 
 // ── Calculate hours from a clock-in/out pair ──
 function calcHours(pair){
-  const inRec  = pair.inRec;
-  const outRec = pair.outRec;
+  if(!pair) return { regular:0, nightDif:0, ot:0 };
+  const inRec  = pair.inRec  || null;
+  const outRec = pair.outRec || null;
   let regular  = 0;
   let nightDif = 0;
   let ot       = 0;
 
-  // OT from clock-out record (or clock-in if only that)
-  const otMins = Number((outRec||inRec)?.ot)||0;
+  // OT in minutes — from clock-out record preferred, else clock-in
+  const otMins = Number((outRec||inRec)?.ot) || 0;
   ot = otMins / 60;
 
+  // Need both records and valid time strings to calc hours
   if(!inRec || !outRec) return { regular, nightDif, ot };
+  if(!inRec.time  || !String(inRec.time).includes(':'))  return { regular, nightDif, ot };
+  if(!outRec.time || !String(outRec.time).includes(':')) return { regular, nightDif, ot };
 
-  // Parse times
-  const [inH,  inM]  = inRec.time.split(':').map(Number);
-  const [outH, outM] = outRec.time.split(':').map(Number);
+  // Parse HH:MM safely
+  const inParts  = String(inRec.time).split(':').map(Number);
+  const outParts = String(outRec.time).split(':').map(Number);
+  if(inParts.some(isNaN) || outParts.some(isNaN)) return { regular, nightDif, ot };
+
+  const [inH,  inM]  = inParts;
+  const [outH, outM] = outParts;
 
   // Total minutes worked
   let totalMins = (outH * 60 + outM) - (inH * 60 + inM);
   if(totalMins < 0) totalMins += 24 * 60; // crosses midnight
   regular = totalMins / 60;
 
-  // Night differential: hours between 8PM (20:00) and 6AM (06:00)
-  // Count minutes in the night diff window
+  // Night differential: 8PM (20:00) to 6AM (06:00)
+  const NIGHT_START = 20 * 60;
+  const NIGHT_END   = 6  * 60;
+  const startMin    = inH * 60 + inM;
+  const endMin      = startMin + totalMins;
   let ndMins = 0;
-  const NIGHT_START = 20 * 60; // 8PM in minutes
-  const NIGHT_END   = 6 * 60;  // 6AM next day in minutes (= 30*60 in 30h clock)
-
-  // Walk through each minute of work and check if it's in night hours
-  const startMin = inH  * 60 + inM;
-  const endMin   = startMin + totalMins;
 
   for(let m = startMin; m < endMin; m++){
-    const mMod = m % (24 * 60); // normalize to 0-1440
+    const mMod = m % (24 * 60);
     if(mMod >= NIGHT_START || mMod < NIGHT_END) ndMins++;
   }
   nightDif = ndMins / 60;
 
-  return { regular: Math.round(regular * 100)/100, nightDif: Math.round(nightDif * 100)/100, ot: Math.round(ot * 100)/100 };
+  return {
+    regular:  Math.round(regular  * 100) / 100,
+    nightDif: Math.round(nightDif * 100) / 100,
+    ot:       Math.round(ot       * 100) / 100,
+  };
 }
 
 function fmtHrs(h){
